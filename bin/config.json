@@ -1,0 +1,6 @@
+{
+    "Config": {
+        "BinaryName": "bin.o",
+        "Generate": "Ascii"
+    }
+}
