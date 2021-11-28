@@ -38,13 +38,6 @@ func (s *Scanner) Scan(source string) error {
 		return err
 	}
 
-	// file, err := os.Open(dataPath + "/" + source)
-	// if err != nil {
-	// 	return err
-	// }
-
-	// defer file.Close()
-
 	if err != nil {
 		return err
 	}
@@ -55,19 +48,6 @@ func (s *Scanner) Scan(source string) error {
 	}
 	s.source = string(bytes)
 	s.scanTokens(s.source)
-
-	// ioScanner := bufio.NewScanner(file)
-	// ioScanner.Split(bufio.ScanLines)
-
-	// for ioScanner.Scan() {
-	// 	s.source = ioScanner.Text()
-
-	// 	if len(s.source) == 0 {
-	// 		continue
-	// 	}
-
-	// 	s.scanTokens(s.source)
-	// }
 
 	for _, token := range s.tokens {
 		log.Println((*token).String())
@@ -89,10 +69,7 @@ func (s *Scanner) scanTokens(line string) {
 
 func (s *Scanner) scanToken() {
 	c := s.advance()
-	// log.Println(c)
-	// if c == "a" {
-	// 	fmt.Println(c)
-	// }
+
 	switch c {
 	case "(":
 		s.addTokenNullLiteral(LEFT_PAREN)
@@ -257,7 +234,7 @@ func (s *Scanner) char() {
 	// The closing "'"
 	s.advance()
 
-	// Trim the surrounding quotes.
+	// Trim the surrounding single quotes.
 	value := s.source[s.start+1 : s.current-1]
 
 	// -2 for right "'" and advanced position
