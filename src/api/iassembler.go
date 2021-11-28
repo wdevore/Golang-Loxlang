@@ -2,5 +2,15 @@ package api
 
 type IAssembler interface {
 	//
-	Configure(runPath string) error
+	Configure(configRelPath string) error
+
+	Properties() IProperties
+	ConfigRelPath() string
+	ReportLine(line int, message string)
+	ReportWhere(line int, where, message string)
+	ErrorOccurred() bool
+	SetError(occurred bool)
+
+	// The main process
+	Run(source string) error
 }

@@ -2,5 +2,8 @@
     "Config": {
         "BinaryName": "bin.o",
         "Generate": "Ascii"
-    }
+    },
+    "Source": [
+        "main.S"
+    ]
 }

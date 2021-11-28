@@ -1,17 +1,3 @@
-# RISCV-Meta-Assembler
-RISC-V meta assembler that adds quality of life features
-
-# Memory map (pg 40 of TheReader)
-- sp = 0xbfffffff
-- 0->128K is reserved
-- code starts at 0x00010001
-- static data follows
-- then Dynamic data
-- and finally the Stack which grows downward.
-
-# Code example
-```
-
 import {
     "stdio" as std
 }
@@ -52,13 +38,12 @@ data {
     string hello "Hello, %s\n", // null terminated
     string world "world",
     char ['a', 'b', 'c'],
-    byte [0x20, 0x0f, 0x40, 0x0a]
-    half [0xff01,0xab02]
-    word [0xffff001],
+    byte [0b00100001, 0x0f, 0x40, 0x0a],
+    half [0xff01,0xab02],
+    word [0xffff0001],
 }
 
-[readWrite, alignTo bytes(4)]
+[readWrite, alignTo bytes(2)]
 data {
     global int<4> count,    // 4 byte integer = word
 }
-```
