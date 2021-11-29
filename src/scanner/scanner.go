@@ -38,14 +38,11 @@ func (s *Scanner) Scan(source string) error {
 		return err
 	}
 
-	if err != nil {
-		return err
-	}
-
 	bytes, err := ioutil.ReadFile(dataPath + "/" + source)
 	if err != nil {
 		return err
 	}
+
 	s.source = string(bytes)
 	s.scanTokens(s.source)
 
