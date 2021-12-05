@@ -8,6 +8,7 @@ type IAssembler interface {
 	ConfigRelPath() string
 	ReportLine(line int, message string)
 	ReportWhere(line int, where, message string)
+	ReportToken(token IToken, message string)
 	ErrorOccurred() bool
 	SetError(occurred bool)
 

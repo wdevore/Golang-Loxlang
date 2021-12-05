@@ -1,6 +1,6 @@
-package scanner
+package api
 
-var keywords = map[string]TokenType{
+var Keywords = map[string]TokenType{
 	"const":    CONST,
 	"import":   IMPORT,
 	"code":     CODE,

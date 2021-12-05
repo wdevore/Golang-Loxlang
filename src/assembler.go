@@ -66,6 +66,14 @@ func (a *Assembler) ReportWhere(line int, where, message string) {
 	a.SetError(true)
 }
 
+func (a *Assembler) ReportToken(token api.IToken, message string) {
+	if token.Type() == api.EOF {
+		a.report.ReportWhere(token.Line(), " at end", message)
+	} else {
+		a.report.ReportWhere(token.Line(), " at '"+token.Lexeme()+"'", message)
+	}
+}
+
 func (a *Assembler) Run(source string) error {
 	scanner := scanner.NewScanner(a)
 

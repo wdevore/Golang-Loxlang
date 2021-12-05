@@ -1,4 +1,4 @@
-package scanner
+package api
 
 type TokenType int64
 
@@ -20,6 +20,9 @@ const (
 	PLUS
 	SLASH // forward slash "/"
 	STAR
+	FALSE
+	TRUE
+	NIL
 
 	// One or two character tokens.
 	BANG // "!"

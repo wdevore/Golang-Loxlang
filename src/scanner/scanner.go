@@ -60,7 +60,7 @@ func (s *Scanner) scanTokens(line string) {
 		s.scanToken()
 	}
 
-	t := NewToken(EOF, "", literals.NewNilLiteral(), 1 /*line*/)
+	t := NewToken(api.EOF, "", literals.NewNilLiteral(), 1 /*line*/)
 	s.tokens = append(s.tokens, t)
 }
 
@@ -69,59 +69,59 @@ func (s *Scanner) scanToken() {
 
 	switch c {
 	case "(":
-		s.addTokenNullLiteral(LEFT_PAREN)
+		s.addTokenNullLiteral(api.LEFT_PAREN)
 	case ")":
-		s.addTokenNullLiteral(RIGHT_PAREN)
+		s.addTokenNullLiteral(api.RIGHT_PAREN)
 	case "{":
-		s.addTokenNullLiteral(LEFT_BRACE)
+		s.addTokenNullLiteral(api.LEFT_BRACE)
 	case "}":
-		s.addTokenNullLiteral(RIGHT_BRACE)
+		s.addTokenNullLiteral(api.RIGHT_BRACE)
 	case "[":
-		s.addTokenNullLiteral(LEFT_BRACKET)
+		s.addTokenNullLiteral(api.LEFT_BRACKET)
 	case "]":
-		s.addTokenNullLiteral(RIGHT_BRACKET)
+		s.addTokenNullLiteral(api.RIGHT_BRACKET)
 	case ",":
-		s.addTokenNullLiteral(COMMA)
+		s.addTokenNullLiteral(api.COMMA)
 	case ".":
-		s.addTokenNullLiteral(DOT)
+		s.addTokenNullLiteral(api.DOT)
 	case "-":
-		s.addTokenNullLiteral(MINUS)
+		s.addTokenNullLiteral(api.MINUS)
 	case "+":
-		s.addTokenNullLiteral(PLUS)
+		s.addTokenNullLiteral(api.PLUS)
 	case "*":
-		s.addTokenNullLiteral(STAR)
+		s.addTokenNullLiteral(api.STAR)
 	case "%":
-		s.addTokenNullLiteral(PERCENT)
+		s.addTokenNullLiteral(api.PERCENT)
 	case "!":
 		match := s.match("=")
 		if match {
-			s.addTokenNullLiteral(BANG_EQUAL)
+			s.addTokenNullLiteral(api.BANG_EQUAL)
 		} else {
-			s.addTokenNullLiteral(BANG)
+			s.addTokenNullLiteral(api.BANG)
 		}
 	case "=":
 		match := s.match("=")
 		if match {
-			s.addTokenNullLiteral(EQUAL_EQUAL)
+			s.addTokenNullLiteral(api.EQUAL_EQUAL)
 		} else {
-			s.addTokenNullLiteral(EQUAL)
+			s.addTokenNullLiteral(api.EQUAL)
 		}
 	case "<":
 		match := s.match("=")
 		if match {
-			s.addTokenNullLiteral(LESS_EQUAL)
+			s.addTokenNullLiteral(api.LESS_EQUAL)
 		} else {
 			// It could be "<42>" example or just "<"
 			if !s.isDigit(s.peek()) {
-				s.addTokenNullLiteral(LESS)
+				s.addTokenNullLiteral(api.LESS)
 			}
 		}
 	case ">":
 		match := s.match("=")
 		if match {
-			s.addTokenNullLiteral(GREATER_EQUAL)
+			s.addTokenNullLiteral(api.GREATER_EQUAL)
 		} else {
-			s.addTokenNullLiteral(GREATER)
+			s.addTokenNullLiteral(api.GREATER)
 		}
 
 	case "/":
@@ -133,7 +133,7 @@ func (s *Scanner) scanToken() {
 				s.advance()
 			}
 		} else {
-			s.addTokenNullLiteral(SLASH)
+			s.addTokenNullLiteral(api.SLASH)
 		}
 	case " ", "\r", "\t":
 		// Ignore whitespace.
@@ -163,11 +163,11 @@ func (s *Scanner) advance() string {
 	return string(s.source[s.current-1])
 }
 
-func (s *Scanner) addTokenNullLiteral(ttype TokenType) {
+func (s *Scanner) addTokenNullLiteral(ttype api.TokenType) {
 	s.addToken(ttype, literals.NewNilLiteral())
 }
 
-func (s *Scanner) addToken(ttype TokenType, literal api.ILiteral) {
+func (s *Scanner) addToken(ttype api.TokenType, literal api.ILiteral) {
 	text := s.source[s.start:s.current]
 	token := NewToken(ttype, text, literal, s.line)
 	s.tokens = append(s.tokens, token)
@@ -212,7 +212,7 @@ func (s *Scanner) string() {
 
 	// Trim the surrounding quotes.
 	value := s.source[s.start+1 : s.current-1]
-	s.addToken(STRING, literals.NewStringLiteral(value))
+	s.addToken(api.STRING, literals.NewStringLiteral(value))
 }
 
 func (s *Scanner) char() {
@@ -240,7 +240,7 @@ func (s *Scanner) char() {
 		return
 	}
 
-	s.addToken(STRING, literals.NewCharLiteral(value))
+	s.addToken(api.STRING, literals.NewCharLiteral(value))
 }
 
 func (s *Scanner) isDigit(c string) bool {
@@ -270,7 +270,7 @@ func (s *Scanner) number() {
 		}
 
 		value := s.source[s.start:s.current]
-		s.addToken(NUMBER, literals.NewNumberLiteral(value))
+		s.addToken(api.NUMBER, literals.NewNumberLiteral(value))
 		return
 	}
 
@@ -285,7 +285,7 @@ func (s *Scanner) number() {
 
 		// Trim "0x"
 		value := s.source[s.start+2 : s.current]
-		s.addToken(NUMBER, literals.NewHexNumberLiteral(value))
+		s.addToken(api.NUMBER, literals.NewHexNumberLiteral(value))
 		return
 	}
 
@@ -299,12 +299,12 @@ func (s *Scanner) number() {
 
 		// Trim "0b"
 		value := s.source[s.start+2 : s.current]
-		s.addToken(NUMBER, literals.NewBinaryNumberLiteral(value))
+		s.addToken(api.NUMBER, literals.NewBinaryNumberLiteral(value))
 		return
 	}
 
 	value := s.source[s.start:s.current]
-	s.addToken(NUMBER, literals.NewIntegerLiteral(value))
+	s.addToken(api.NUMBER, literals.NewIntegerLiteral(value))
 }
 
 func (s *Scanner) identifier() {
@@ -313,9 +313,9 @@ func (s *Scanner) identifier() {
 	}
 
 	text := s.source[s.start:s.current]
-	ttype := keywords[text]
-	if ttype == UNDEFINED {
-		ttype = IDENTIFIER
+	ttype := api.Keywords[text]
+	if ttype == api.UNDEFINED {
+		ttype = api.IDENTIFIER
 	}
 
 	s.addTokenNullLiteral(ttype)
