@@ -7,7 +7,7 @@ const {
     GPIO_RED  = 0x400000
 }
 
-// Program code section.
+// Program code section the is "global"
 // align code to 2^2 bytes = word alignment
 // declares "main" symbol as global
 // positions code at address 0x00010001
@@ -33,8 +33,9 @@ code main {
     ret
 }
 
+// A section labeled "stuff" that is local to this file
 [readOnly, alignTo bytes<4>, at 0x10000000]
-data {
+data stuff {
     string hello "Hello, %s\n", // null terminated
     string world "world",
     char ['a', 'b', 'c'],
@@ -44,6 +45,6 @@ data {
 }
 
 [readWrite, alignTo bytes(2)]
-data {
+data counters {
     global int<4> count,    // 4 byte integer = word
 }

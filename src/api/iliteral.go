@@ -13,6 +13,10 @@ type ICharLiteral interface {
 	ILiteral
 }
 
+type IIntegerLiteral interface {
+	ILiteral
+}
+
 type INumberLiteral interface {
 	ILiteral
 }

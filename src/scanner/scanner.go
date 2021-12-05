@@ -13,7 +13,7 @@ type Scanner struct {
 	assembler api.IAssembler
 
 	source string
-	tokens []*Token
+	tokens []api.IToken
 
 	start   int
 	current int
@@ -47,7 +47,7 @@ func (s *Scanner) Scan(source string) error {
 	s.scanTokens(s.source)
 
 	for _, token := range s.tokens {
-		log.Println((*token).String())
+		log.Println(token)
 	}
 
 	return nil
@@ -304,7 +304,7 @@ func (s *Scanner) number() {
 	}
 
 	value := s.source[s.start:s.current]
-	s.addToken(NUMBER, literals.NewNumberLiteral(value))
+	s.addToken(NUMBER, literals.NewIntegerLiteral(value))
 }
 
 func (s *Scanner) identifier() {

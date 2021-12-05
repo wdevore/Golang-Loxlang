@@ -9,13 +9,17 @@ type Token struct {
 	line    int
 }
 
-func NewToken(ttype TokenType, lexeme string, literal api.ILiteral, line int) *Token {
+func NewToken(ttype TokenType, lexeme string, literal api.ILiteral, line int) api.IToken {
 	t := new(Token)
 	t.ttype = ttype
 	t.lexeme = lexeme
 	t.literal = literal
 	t.line = line
 	return t
+}
+
+func (t *Token) Lexeme() string {
+	return t.lexeme
 }
 
 func (t Token) String() string {
