@@ -21,6 +21,8 @@ type Assembler struct {
 	errorOccurred bool
 
 	report api.IReporter
+
+	expression api.IExpression
 }
 
 // NewAssembler creates a new assembler for compiling assembly code
@@ -86,16 +88,18 @@ func (a *Assembler) Run(source string) error {
 
 	parser := parser.NewParser(a, tokens)
 
-	expr, errp := parser.Parse()
-	if errp != nil {
-		return fmt.Errorf("unexpected error occurred during parser: %v", errp)
+	a.expression, err = parser.Parse()
+	if err != nil {
+		return fmt.Errorf("unexpected error occurred during parser: %v", err)
 	}
 
-	astPrinter := ast.NewAstPrinter().(*ast.AstPrinter)
-	pretty := astPrinter.Print(expr)
-	fmt.Println(pretty)
-
 	return nil
+}
+
+func (a *Assembler) Print() {
+	astPrinter := ast.NewAstPrinter().(*ast.AstPrinter)
+	pretty := astPrinter.Print(a.expression)
+	fmt.Println(pretty)
 }
 
 func (a *Assembler) loadProperties(configRelPath string) (properties api.IProperties, err error) {
