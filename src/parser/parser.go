@@ -216,7 +216,7 @@ func (p *Parser) primary() (expr api.IExpression, err error) {
 
 	// If none of the cases in there match,
 	// it means we are sitting on a token that can’t start an expression.
-	return nil, errors.New("Expect expression.")
+	return nil, p.lerror(p.previous(), "Expected expression to begin.")
 }
 
 func (p *Parser) consume(ttype api.TokenType, message string) (token api.IToken, err error) {

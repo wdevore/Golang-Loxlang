@@ -81,14 +81,14 @@ func (a *Assembler) Run(source string) error {
 
 	tokens, err := scanner.Scan(source)
 	if err != nil {
-		return fmt.Errorf("unexpected error occurred during scan: %s", err)
+		return fmt.Errorf("unexpected error occurred during scan: %v", err)
 	}
 
 	parser := parser.NewParser(a, tokens)
 
 	expr, errp := parser.Parse()
 	if errp != nil {
-		return fmt.Errorf("unexpected error occurred during parser: %s", err)
+		return fmt.Errorf("unexpected error occurred during parser: %v", errp)
 	}
 
 	astPrinter := ast.NewAstPrinter().(*ast.AstPrinter)
