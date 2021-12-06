@@ -4,7 +4,7 @@ import {
 
 const {
     GPIO_BASE = 0x10012000,  // GPIO base
-    GPIO_RED  = 0x400000
+    GPIO_RED  = 0x400000,
 }
 
 // Program code section the is "global"

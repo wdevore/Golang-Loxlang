@@ -21,23 +21,37 @@ func NewParser(assembler api.IAssembler, tokens []api.IToken) *Parser {
 	return o
 }
 
-func (p *Parser) expression() api.IExpression {
+func (p *Parser) Parse() (expr api.IExpression, err error) {
+	expr, err = p.expression()
+	if err != nil {
+		p.assembler.SetError(true)
+	}
+	return expr, err
+}
+
+func (p *Parser) expression() (expr api.IExpression, err error) {
 	return p.equality()
 }
 
 // --------------------------------------------------------
 // equality → comparison ( ( "!=" | "==" ) comparison )*
 // --------------------------------------------------------
-func (p *Parser) equality() api.IExpression {
-	expr := p.comparison()
+func (p *Parser) equality() (expr api.IExpression, err error) {
+	expr, err = p.comparison()
+	if err != nil {
+		return nil, err
+	}
 
 	for p.match(api.BANG_EQUAL, api.EQUAL_EQUAL) {
 		operator := p.previous()
-		right := p.comparison()
+		right, errc := p.comparison()
+		if errc != nil {
+			return nil, errc
+		}
 		expr = ast.NewBinaryExpression(expr, operator, right)
 	}
 
-	return expr
+	return expr, nil
 }
 
 // This checks to see if the current token has any of the given types.
@@ -91,57 +105,78 @@ func (p *Parser) previous() api.IToken {
 // --------------------------------------------------------
 // comparison → term ( ( ">" | ">=" | "<" | "<=" ) term )*
 // --------------------------------------------------------
-func (p *Parser) comparison() api.IExpression {
-	expr := p.term()
+func (p *Parser) comparison() (expr api.IExpression, err error) {
+	expr, err = p.term()
+	if err != nil {
+		return nil, err
+	}
 
 	for p.match(api.GREATER, api.GREATER_EQUAL, api.LESS, api.LESS_EQUAL) {
 		operator := p.previous()
-		right := p.term()
+		right, errc := p.term()
+		if errc != nil {
+			return nil, errc
+		}
 		expr = ast.NewBinaryExpression(expr, operator, right)
 	}
 
-	return expr
+	return expr, nil
 }
 
 // --------------------------------------------------------
 // term → factor ( ( "-" | "+" ) factor )*
 // --------------------------------------------------------
-func (p *Parser) term() api.IExpression {
-	expr := p.factor()
+func (p *Parser) term() (expr api.IExpression, err error) {
+	expr, err = p.factor()
+	if err != nil {
+		return nil, err
+	}
 
 	for p.match(api.MINUS, api.PLUS) {
 		operator := p.previous()
-		right := p.factor()
+		right, errc := p.factor()
+		if errc != nil {
+			return nil, errc
+		}
 		expr = ast.NewBinaryExpression(expr, operator, right)
 	}
 
-	return expr
+	return expr, nil
 }
 
 // --------------------------------------------------------
 // factor → unary ( ( "/" | "*" ) unary )*
 // --------------------------------------------------------
-func (p *Parser) factor() api.IExpression {
-	expr := p.unary()
+func (p *Parser) factor() (expr api.IExpression, err error) {
+	expr, err = p.unary()
+	if err != nil {
+		return nil, err
+	}
 
 	for p.match(api.SLASH, api.STAR) {
 		operator := p.previous()
-		right := p.unary()
+		right, errc := p.unary()
+		if errc != nil {
+			return nil, errc
+		}
 		expr = ast.NewBinaryExpression(expr, operator, right)
 	}
 
-	return expr
+	return expr, nil
 }
 
 // --------------------------------------------------------
 // unary → ( "!" | "-" ) unary | primary ;
 // --------------------------------------------------------
-func (p *Parser) unary() api.IExpression {
+func (p *Parser) unary() (expr api.IExpression, err error) {
 
 	if p.match(api.BANG, api.MINUS) {
 		operator := p.previous()
-		right := p.unary()
-		return ast.NewUnaryExpression(operator, right)
+		right, errc := p.unary()
+		if errc != nil {
+			return nil, errc
+		}
+		return ast.NewUnaryExpression(operator, right), nil
 	}
 
 	return p.primary()
@@ -150,30 +185,38 @@ func (p *Parser) unary() api.IExpression {
 // --------------------------------------------------------
 // primary → NUMBER | STRING | "true" | "false" | "nil" | "(" expression ")"
 // --------------------------------------------------------
-func (p *Parser) primary() api.IExpression {
+func (p *Parser) primary() (expr api.IExpression, err error) {
 
 	if p.match(api.FALSE) {
-		return ast.NewLiteralExpression(literals.NewBooleanLiteral(false))
+		return ast.NewLiteralExpression(literals.NewBooleanLiteral(false)), nil
 	}
 	if p.match(api.TRUE) {
-		return ast.NewLiteralExpression(literals.NewBooleanLiteral(true))
+		return ast.NewLiteralExpression(literals.NewBooleanLiteral(true)), nil
 	}
 	if p.match(api.NIL) {
-		return ast.NewLiteralExpression(literals.NewNilLiteral())
+		return ast.NewLiteralExpression(literals.NewNilLiteral()), nil
 	}
 
 	if p.match(api.NUMBER, api.STRING) {
 		// NOTE: may need to copy the literal!!!!
-		return ast.NewLiteralExpression(p.previous().Literal())
+		return ast.NewLiteralExpression(p.previous().Literal()), nil
 	}
 
 	if p.match(api.LEFT_PAREN) {
-		expr := p.expression()
-		p.consume(api.RIGHT_PAREN, "Expect ')' after expression")
-		return ast.NewGroupingExpression(expr)
+		expr, errc := p.expression()
+		if errc != nil {
+			return nil, errc
+		}
+		_, err = p.consume(api.RIGHT_PAREN, "Expect ')' after expression")
+		if err != nil {
+			return nil, err
+		}
+		return ast.NewGroupingExpression(expr), nil
 	}
 
-	return nil
+	// If none of the cases in there match,
+	// it means we are sitting on a token that can’t start an expression.
+	return nil, errors.New("Expect expression.")
 }
 
 func (p *Parser) consume(ttype api.TokenType, message string) (token api.IToken, err error) {
@@ -188,4 +231,102 @@ func (p *Parser) consume(ttype api.TokenType, message string) (token api.IToken,
 func (p *Parser) lerror(ttype api.IToken, message string) error {
 	p.assembler.ReportToken(ttype, message)
 	return errors.New(message)
+}
+
+// It discards tokens until it thinks it found a statement boundary.
+func (p *Parser) synchronize() {
+	p.advance()
+
+	for !p.isAtEnd() {
+		if p.previous().Type() == api.RIGHT_BRACE {
+			return
+		}
+
+		switch p.peek().Type() {
+		case api.CONST,
+			api.IMPORT,
+			api.CODE,
+			api.ALIGN_TO,
+			api.GLOBAL,
+			api.AT,
+			api.AS,
+			api.USE,
+			api.READ_ONLY,
+			api.BYTE,
+			api.HALF,
+			api.WORD,
+			api.DATA,
+			api.INT,
+			api.HI,
+			api.LO,
+			api.ADD,
+			api.SUB,
+			api.XOR,
+			api.OR,
+			api.AND,
+			api.SLL,
+			api.SRL,
+			api.SRA,
+			api.SLT,
+			api.SLTU,
+			api.ADDI,
+			api.XORI,
+			api.ORI,
+			api.ANDI,
+			api.SLLI,
+			api.SRLI,
+			api.SRAI,
+			api.SLTI,
+			api.SLTIU,
+			api.LB,
+			api.LH,
+			api.LW,
+			api.LBU,
+			api.LHU,
+			api.SB,
+			api.SH,
+			api.SW,
+			api.BEQ,
+			api.BNE,
+			api.BLT,
+			api.BGE,
+			api.BLTU,
+			api.BGEU,
+			api.JAL,
+			api.JALR,
+			api.LUI,
+			api.AUIPC,
+			api.ECALL,
+			api.EBREAK,
+			api.LA,
+			api.NOP,
+			api.LI,
+			api.MV,
+			api.NOT,
+			api.NEG,
+			api.NEGW,
+			api.SEXT,
+			api.SEQZ,
+			api.SNEZ,
+			api.SLTZ,
+			api.SGTZ,
+			api.BEQZ,
+			api.BNEZ,
+			api.BLEZ,
+			api.BGEZ,
+			api.BLTZ,
+			api.BGTZ,
+			api.BGT,
+			api.BLE,
+			api.BGTU,
+			api.BLEU,
+			api.J,
+			api.RET,
+			api.CALL,
+			api.TAIL:
+			return
+		}
+	}
+
+	p.advance()
 }

@@ -2,7 +2,6 @@ package scanner
 
 import (
 	"io/ioutil"
-	"log"
 	"path/filepath"
 
 	"github.com/wdevore/RISCV-Meta-Assembler/src/api"
@@ -29,28 +28,28 @@ func NewScanner(assembler api.IAssembler) *Scanner {
 	return s
 }
 
-func (s *Scanner) Scan(source string) error {
+func (s *Scanner) Scan(source string) (tokens []api.IToken, err error) {
 	s.source = source
 
 	dataPath, err := filepath.Abs(s.assembler.ConfigRelPath())
 
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	bytes, err := ioutil.ReadFile(dataPath + "/" + source)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	s.source = string(bytes)
 	s.scanTokens(s.source)
 
-	for _, token := range s.tokens {
-		log.Println(token)
-	}
+	// for _, token := range s.tokens {
+	// 	log.Println(token)
+	// }
 
-	return nil
+	return s.tokens, nil
 }
 
 func (s *Scanner) scanTokens(line string) {

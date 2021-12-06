@@ -12,7 +12,7 @@ import (
 )
 
 func main() {
-	test_expression()
+	run_assembler()
 }
 
 func run_assembler() {
@@ -43,7 +43,7 @@ func run_assembler() {
 }
 
 func test_expression() {
-	// (* (- 123) (group 45.67))
+	// (* (- 123) (group 45.67)) = -123 * (45.67)
 	// (* (- 123) (group 45.669998))
 
 	expression := ast.NewBinaryExpression(

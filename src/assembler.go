@@ -9,6 +9,8 @@ import (
 	"path/filepath"
 
 	"github.com/wdevore/RISCV-Meta-Assembler/src/api"
+	"github.com/wdevore/RISCV-Meta-Assembler/src/ast"
+	"github.com/wdevore/RISCV-Meta-Assembler/src/parser"
 	"github.com/wdevore/RISCV-Meta-Assembler/src/scanner"
 )
 
@@ -77,11 +79,21 @@ func (a *Assembler) ReportToken(token api.IToken, message string) {
 func (a *Assembler) Run(source string) error {
 	scanner := scanner.NewScanner(a)
 
-	err := scanner.Scan(source)
-
+	tokens, err := scanner.Scan(source)
 	if err != nil {
 		return fmt.Errorf("unexpected error occurred during scan: %s", err)
 	}
+
+	parser := parser.NewParser(a, tokens)
+
+	expr, errp := parser.Parse()
+	if errp != nil {
+		return fmt.Errorf("unexpected error occurred during parser: %s", err)
+	}
+
+	astPrinter := ast.NewAstPrinter().(*ast.AstPrinter)
+	pretty := astPrinter.Print(expr)
+	fmt.Println(pretty)
 
 	return nil
 }
