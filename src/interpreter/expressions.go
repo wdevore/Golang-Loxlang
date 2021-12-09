@@ -1,4 +1,4 @@
-package ast
+package interpreter
 
 import "github.com/wdevore/RISCV-Meta-Assembler/src/api"
 
@@ -19,8 +19,28 @@ func NewBinaryExpression(left api.IExpression, operator api.IToken, right api.IE
 	return e
 }
 
-func (e *BinaryExpression) Accept(visitor api.IVisitor) interface{} {
+func (e *BinaryExpression) Accept(visitor api.IVisitor) (obj interface{}, err api.IRuntimeError) {
 	return visitor.VisitBinaryExpression(e)
+}
+
+func (e *BinaryExpression) Value() interface{} {
+	return nil
+}
+
+func (e *BinaryExpression) Left() api.IExpression {
+	return e.left
+}
+
+func (e *BinaryExpression) Operator() api.IToken {
+	return e.operator
+}
+
+func (e *BinaryExpression) Right() api.IExpression {
+	return e.right
+}
+
+func (e *BinaryExpression) Expression() api.IExpression {
+	return nil
 }
 
 // ---------------------------------------------------
@@ -36,8 +56,28 @@ func NewGroupingExpression(expression api.IExpression) api.IExpression {
 	return e
 }
 
-func (e *GroupingExpression) Accept(visitor api.IVisitor) interface{} {
+func (e *GroupingExpression) Accept(visitor api.IVisitor) (obj interface{}, err api.IRuntimeError) {
 	return visitor.VisitGroupingExpression(e)
+}
+
+func (e *GroupingExpression) Value() interface{} {
+	return nil
+}
+
+func (e *GroupingExpression) Left() api.IExpression {
+	return nil
+}
+
+func (e *GroupingExpression) Operator() api.IToken {
+	return nil
+}
+
+func (e *GroupingExpression) Right() api.IExpression {
+	return nil
+}
+
+func (e *GroupingExpression) Expression() api.IExpression {
+	return e.expression
 }
 
 // ---------------------------------------------------
@@ -53,8 +93,28 @@ func NewLiteralExpression(value api.ILiteral) api.IExpression {
 	return e
 }
 
-func (e *LiteralExpression) Accept(visitor api.IVisitor) interface{} {
+func (e *LiteralExpression) Accept(visitor api.IVisitor) (obj interface{}, err api.IRuntimeError) {
 	return visitor.VisitLiteralExpression(e)
+}
+
+func (e *LiteralExpression) Value() interface{} {
+	return e.value
+}
+
+func (e *LiteralExpression) Left() api.IExpression {
+	return nil
+}
+
+func (e *LiteralExpression) Operator() api.IToken {
+	return nil
+}
+
+func (e *LiteralExpression) Right() api.IExpression {
+	return nil
+}
+
+func (e *LiteralExpression) Expression() api.IExpression {
+	return nil
 }
 
 // ---------------------------------------------------
@@ -72,8 +132,28 @@ func NewUnaryExpression(operator api.IToken, right api.IExpression) api.IExpress
 	return e
 }
 
-func (e *UnaryExpression) Accept(visitor api.IVisitor) interface{} {
+func (e *UnaryExpression) Accept(visitor api.IVisitor) (obj interface{}, err api.IRuntimeError) {
 	return visitor.VisitUnaryExpression(e)
+}
+
+func (e *UnaryExpression) Value() interface{} {
+	return nil
+}
+
+func (e *UnaryExpression) Left() api.IExpression {
+	return nil
+}
+
+func (e *UnaryExpression) Operator() api.IToken {
+	return e.operator
+}
+
+func (e *UnaryExpression) Right() api.IExpression {
+	return e.right
+}
+
+func (e *UnaryExpression) Expression() api.IExpression {
+	return nil
 }
 
 /*

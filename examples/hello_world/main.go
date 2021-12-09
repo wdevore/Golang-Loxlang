@@ -6,7 +6,7 @@ import (
 
 	"github.com/wdevore/RISCV-Meta-Assembler/src"
 	"github.com/wdevore/RISCV-Meta-Assembler/src/api"
-	"github.com/wdevore/RISCV-Meta-Assembler/src/ast"
+	"github.com/wdevore/RISCV-Meta-Assembler/src/interpreter"
 	"github.com/wdevore/RISCV-Meta-Assembler/src/scanner"
 	"github.com/wdevore/RISCV-Meta-Assembler/src/scanner/literals"
 )
@@ -48,22 +48,22 @@ func test_expression() {
 	// (* (- 123) (group 45.67)) = -123 * (45.67)
 	// (* (- 123) (group 45.669998))
 
-	expression := ast.NewBinaryExpression(
-		ast.NewUnaryExpression(
+	expression := interpreter.NewBinaryExpression(
+		interpreter.NewUnaryExpression(
 			scanner.NewToken(api.MINUS, "-", nil, 1),
-			ast.NewLiteralExpression(
+			interpreter.NewLiteralExpression(
 				literals.NewIntegerLiteral("123"),
 			),
 		),
 		scanner.NewToken(api.STAR, "*", nil, 1),
-		ast.NewGroupingExpression(
-			ast.NewLiteralExpression(
+		interpreter.NewGroupingExpression(
+			interpreter.NewLiteralExpression(
 				literals.NewNumberLiteral("45.67"),
 			),
 		),
 	)
 
-	astPrinter := ast.NewAstPrinter().(*ast.AstPrinter)
+	astPrinter := interpreter.NewAstPrinter().(*interpreter.AstPrinter)
 	pretty := astPrinter.Print(expression)
 	fmt.Println(pretty)
 }

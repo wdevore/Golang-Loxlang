@@ -1,8 +1,8 @@
 package api
 
 type IVisitor interface {
-	VisitBinaryExpression(IExpression) interface{}
-	VisitGroupingExpression(IExpression) interface{}
-	VisitLiteralExpression(IExpression) interface{}
-	VisitUnaryExpression(IExpression) interface{}
+	VisitBinaryExpression(IExpression) (obj interface{}, err IRuntimeError)
+	VisitGroupingExpression(IExpression) (obj interface{}, err IRuntimeError)
+	VisitLiteralExpression(IExpression) (obj interface{}, err IRuntimeError)
+	VisitUnaryExpression(IExpression) (obj interface{}, err IRuntimeError)
 }

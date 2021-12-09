@@ -3,19 +3,23 @@ package literals
 import "github.com/wdevore/RISCV-Meta-Assembler/src/api"
 
 type CharLiteral struct {
-	value string
+	value rune
 }
 
-func NewCharLiteral(value string) api.ICharLiteral {
+func NewCharLiteral(value rune) api.ICharLiteral {
 	s := new(CharLiteral)
 	s.value = value
 	return s
 }
 
-func (s CharLiteral) String() string {
-	return s.value
+func (c CharLiteral) String() string {
+	return string(c.value)
 }
 
-func (s *CharLiteral) Value() interface{} {
-	return s.value
+func (c *CharLiteral) Value() interface{} {
+	return c.value
+}
+
+func (c *CharLiteral) CharValue() rune {
+	return c.value
 }

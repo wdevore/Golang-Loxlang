@@ -4,7 +4,7 @@ import (
 	"errors"
 
 	"github.com/wdevore/RISCV-Meta-Assembler/src/api"
-	"github.com/wdevore/RISCV-Meta-Assembler/src/ast"
+	"github.com/wdevore/RISCV-Meta-Assembler/src/interpreter"
 	"github.com/wdevore/RISCV-Meta-Assembler/src/scanner/literals"
 )
 
@@ -48,7 +48,7 @@ func (p *Parser) equality() (expr api.IExpression, err error) {
 		if errc != nil {
 			return nil, errc
 		}
-		expr = ast.NewBinaryExpression(expr, operator, right)
+		expr = interpreter.NewBinaryExpression(expr, operator, right)
 	}
 
 	return expr, nil
@@ -117,7 +117,7 @@ func (p *Parser) comparison() (expr api.IExpression, err error) {
 		if errc != nil {
 			return nil, errc
 		}
-		expr = ast.NewBinaryExpression(expr, operator, right)
+		expr = interpreter.NewBinaryExpression(expr, operator, right)
 	}
 
 	return expr, nil
@@ -138,7 +138,7 @@ func (p *Parser) term() (expr api.IExpression, err error) {
 		if errc != nil {
 			return nil, errc
 		}
-		expr = ast.NewBinaryExpression(expr, operator, right)
+		expr = interpreter.NewBinaryExpression(expr, operator, right)
 	}
 
 	return expr, nil
@@ -159,7 +159,7 @@ func (p *Parser) factor() (expr api.IExpression, err error) {
 		if errc != nil {
 			return nil, errc
 		}
-		expr = ast.NewBinaryExpression(expr, operator, right)
+		expr = interpreter.NewBinaryExpression(expr, operator, right)
 	}
 
 	return expr, nil
@@ -176,7 +176,7 @@ func (p *Parser) unary() (expr api.IExpression, err error) {
 		if errc != nil {
 			return nil, errc
 		}
-		return ast.NewUnaryExpression(operator, right), nil
+		return interpreter.NewUnaryExpression(operator, right), nil
 	}
 
 	return p.primary()
@@ -188,18 +188,18 @@ func (p *Parser) unary() (expr api.IExpression, err error) {
 func (p *Parser) primary() (expr api.IExpression, err error) {
 
 	if p.match(api.FALSE) {
-		return ast.NewLiteralExpression(literals.NewBooleanLiteral(false)), nil
+		return interpreter.NewLiteralExpression(literals.NewBooleanLiteral(false)), nil
 	}
 	if p.match(api.TRUE) {
-		return ast.NewLiteralExpression(literals.NewBooleanLiteral(true)), nil
+		return interpreter.NewLiteralExpression(literals.NewBooleanLiteral(true)), nil
 	}
 	if p.match(api.NIL) {
-		return ast.NewLiteralExpression(literals.NewNilLiteral()), nil
+		return interpreter.NewLiteralExpression(literals.NewNilLiteral()), nil
 	}
 
 	if p.match(api.NUMBER, api.STRING) {
 		// NOTE: may need to copy the literal!!!!
-		return ast.NewLiteralExpression(p.previous().Literal()), nil
+		return interpreter.NewLiteralExpression(p.previous().Literal()), nil
 	}
 
 	if p.match(api.LEFT_PAREN) {
@@ -211,7 +211,7 @@ func (p *Parser) primary() (expr api.IExpression, err error) {
 		if err != nil {
 			return nil, err
 		}
-		return ast.NewGroupingExpression(expr), nil
+		return interpreter.NewGroupingExpression(expr), nil
 	}
 
 	// If none of the cases in there match,

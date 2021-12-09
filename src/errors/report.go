@@ -1,7 +1,7 @@
-package src
+package errors
 
 import (
-	"fmt"
+	"log"
 
 	"github.com/wdevore/RISCV-Meta-Assembler/src/api"
 )
@@ -15,9 +15,9 @@ func NewReport() api.IReporter {
 }
 
 func (r *Report) ReportLine(line int, message string) {
-	fmt.Printf("[line %d] Error: %s", line, message)
+	log.Printf("[line %d] Error: %s", line, message)
 }
 
 func (r *Report) ReportWhere(line int, where, message string) {
-	fmt.Printf("[line %d] Error %s : %s", line, where, message)
+	log.Printf("[line %d] Error %s : %s", line, where, message)
 }

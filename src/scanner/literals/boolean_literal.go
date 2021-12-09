@@ -10,16 +10,20 @@ type BooleanLiteral struct {
 	value bool
 }
 
-func NewBooleanLiteral(value bool) api.IIntegerLiteral {
+func NewBooleanLiteral(value bool) api.IBooleanLiteral {
 	s := new(BooleanLiteral)
 	s.value = value
 	return s
 }
 
-func (n BooleanLiteral) String() string {
-	return fmt.Sprintf("%v", n.value)
+func (b BooleanLiteral) String() string {
+	return fmt.Sprintf("%v", b.value)
 }
 
-func (n *BooleanLiteral) Value() interface{} {
-	return n.value
+func (b *BooleanLiteral) Value() interface{} {
+	return b.value
+}
+
+func (b *BooleanLiteral) BoolValue() bool {
+	return b.value
 }

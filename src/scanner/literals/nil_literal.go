@@ -12,10 +12,14 @@ func NewNilLiteral() api.INilLiteral {
 	return s
 }
 
-func (s NilLiteral) String() string {
-	return s.value
+func (n NilLiteral) String() string {
+	return n.value
 }
 
-func (s *NilLiteral) Value() interface{} {
-	return s.value
+func (n *NilLiteral) Value() interface{} {
+	return n.value
+}
+
+func (n *NilLiteral) NilValue() string {
+	return n.value
 }

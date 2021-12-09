@@ -8,19 +8,30 @@ import (
 )
 
 type IntegerLiteral struct {
-	value int64
+	value int
 }
 
 func NewIntegerLiteral(value string) api.IIntegerLiteral {
 	s := new(IntegerLiteral)
-	s.value, _ = strconv.ParseInt(value, 10, 32)
+	pi, _ := strconv.ParseInt(value, 10, 32)
+	s.value = int(pi)
 	return s
 }
 
-func (n IntegerLiteral) String() string {
-	return fmt.Sprintf("%d", n.value)
+func NewIntegerLiteralVal(value int) api.IIntegerLiteral {
+	s := new(IntegerLiteral)
+	s.value = value
+	return s
 }
 
-func (n *IntegerLiteral) Value() interface{} {
-	return n.value
+func (i IntegerLiteral) String() string {
+	return fmt.Sprintf("%d", i.value)
+}
+
+func (i *IntegerLiteral) Value() interface{} {
+	return i.value
+}
+
+func (i *IntegerLiteral) IntValue() int {
+	return i.value
 }

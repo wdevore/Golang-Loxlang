@@ -9,7 +9,8 @@ import (
 	"path/filepath"
 
 	"github.com/wdevore/RISCV-Meta-Assembler/src/api"
-	"github.com/wdevore/RISCV-Meta-Assembler/src/ast"
+	"github.com/wdevore/RISCV-Meta-Assembler/src/errors"
+	"github.com/wdevore/RISCV-Meta-Assembler/src/interpreter"
 	"github.com/wdevore/RISCV-Meta-Assembler/src/parser"
 	"github.com/wdevore/RISCV-Meta-Assembler/src/scanner"
 )
@@ -22,13 +23,16 @@ type Assembler struct {
 
 	report api.IReporter
 
-	expression api.IExpression
+	expression  api.IExpression
+	interpreter api.IInterpreter
 }
 
 // NewAssembler creates a new assembler for compiling assembly code
 func NewAssembler() (assembler api.IAssembler, err error) {
 	ass := new(Assembler)
-	ass.report = NewReport()
+	ass.report = errors.NewReport()
+	ass.interpreter = interpreter.NewInterpreter()
+
 	return ass, nil
 }
 
@@ -93,13 +97,19 @@ func (a *Assembler) Run(source string) error {
 		return fmt.Errorf("unexpected error occurred during parser: %v", err)
 	}
 
+	rerr := a.interpreter.Interpret(a.expression)
+
+	if rerr != nil {
+		return fmt.Errorf("unexpected error occurred during interpreting: %v", rerr)
+	}
+
 	return nil
 }
 
 func (a *Assembler) Print() {
-	astPrinter := ast.NewAstPrinter().(*ast.AstPrinter)
+	astPrinter := interpreter.NewAstPrinter().(*interpreter.AstPrinter)
 	pretty := astPrinter.Print(a.expression)
-	fmt.Println(pretty)
+	log.Println(pretty)
 }
 
 func (a *Assembler) loadProperties(configRelPath string) (properties api.IProperties, err error) {

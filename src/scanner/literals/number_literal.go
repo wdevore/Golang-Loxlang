@@ -17,10 +17,20 @@ func NewNumberLiteral(value string) api.INumberLiteral {
 	return s
 }
 
+func NewNumberLiteralVal(value float64) api.INumberLiteral {
+	s := new(NumberLiteral)
+	s.value = value
+	return s
+}
+
 func (n NumberLiteral) String() string {
 	return fmt.Sprintf("%f", n.value)
 }
 
 func (n *NumberLiteral) Value() interface{} {
+	return n.value
+}
+
+func (n *NumberLiteral) NumValue() float64 {
 	return n.value
 }

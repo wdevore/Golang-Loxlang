@@ -239,7 +239,7 @@ func (s *Scanner) char() {
 		return
 	}
 
-	s.addToken(api.STRING, literals.NewCharLiteral(value))
+	s.addToken(api.STRING, literals.NewCharLiteral([]rune(value)[0]))
 }
 
 func (s *Scanner) isDigit(c string) bool {

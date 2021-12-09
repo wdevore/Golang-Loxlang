@@ -10,16 +10,20 @@ type BinaryNumberLiteral struct {
 	value string
 }
 
-func NewBinaryNumberLiteral(value string) api.INumberLiteral {
+func NewBinaryNumberLiteral(value string) api.IBinaryNumberLiteral {
 	s := new(BinaryNumberLiteral)
 	s.value = value
 	return s
 }
 
-func (n BinaryNumberLiteral) String() string {
-	return fmt.Sprintf("0b%s", n.value)
+func (b BinaryNumberLiteral) String() string {
+	return fmt.Sprintf("0b%s", b.value)
 }
 
-func (n *BinaryNumberLiteral) Value() interface{} {
-	return n.value
+func (b *BinaryNumberLiteral) Value() interface{} {
+	return b.value
+}
+
+func (b *BinaryNumberLiteral) BinValue() string {
+	return b.value
 }

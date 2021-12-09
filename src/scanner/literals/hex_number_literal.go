@@ -10,7 +10,7 @@ type HexNumberLiteral struct {
 	value string
 }
 
-func NewHexNumberLiteral(value string) api.INumberLiteral {
+func NewHexNumberLiteral(value string) api.IHexNumberLiteral {
 	s := new(HexNumberLiteral)
 	l := len(value)
 	if l < 3 {
@@ -25,10 +25,14 @@ func NewHexNumberLiteral(value string) api.INumberLiteral {
 	return s
 }
 
-func (n HexNumberLiteral) String() string {
-	return fmt.Sprintf("0x%s", n.value)
+func (h HexNumberLiteral) String() string {
+	return fmt.Sprintf("0x%s", h.value)
 }
 
-func (n *HexNumberLiteral) Value() interface{} {
-	return n.value
+func (h *HexNumberLiteral) Value() interface{} {
+	return h.value
+}
+
+func (h *HexNumberLiteral) HexValue() string {
+	return h.value
 }
