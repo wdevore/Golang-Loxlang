@@ -188,7 +188,7 @@ func (i *Interpreter) VisitBinaryExpression(exprV api.IExpression) (obj interfac
 
 		il, ir, err := i.extractIntegers(left, right, exprV.Operator())
 		if err == nil {
-			nl := literals.NewIntegerLiteralVal(il - ir)
+			nl := literals.NewIntegerLiteralVal(il + ir)
 			return nl, nil
 		}
 
