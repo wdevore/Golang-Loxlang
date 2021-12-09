@@ -27,10 +27,6 @@ func (n NumberLiteral) String() string {
 	return fmt.Sprintf("%f", n.value)
 }
 
-func (n *NumberLiteral) Value() interface{} {
-	return n.value
-}
-
 func (n *NumberLiteral) NumValue() float64 {
 	return n.value
 }

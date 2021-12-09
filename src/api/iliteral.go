@@ -2,7 +2,6 @@ package api
 
 type ILiteral interface {
 	String() string
-	Value() interface{}
 }
 
 type IStringLiteral interface {

@@ -16,10 +16,6 @@ func (c CharLiteral) String() string {
 	return string(c.value)
 }
 
-func (c *CharLiteral) Value() interface{} {
-	return c.value
-}
-
 func (c *CharLiteral) CharValue() rune {
 	return c.value
 }

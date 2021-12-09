@@ -29,10 +29,6 @@ func (h HexNumberLiteral) String() string {
 	return fmt.Sprintf("0x%s", h.value)
 }
 
-func (h *HexNumberLiteral) Value() interface{} {
-	return h.value
-}
-
 func (h *HexNumberLiteral) HexValue() string {
 	return h.value
 }

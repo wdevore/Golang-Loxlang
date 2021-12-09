@@ -28,10 +28,6 @@ func (i IntegerLiteral) String() string {
 	return fmt.Sprintf("%d", i.value)
 }
 
-func (i *IntegerLiteral) Value() interface{} {
-	return i.value
-}
-
 func (i *IntegerLiteral) IntValue() int {
 	return i.value
 }

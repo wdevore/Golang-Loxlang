@@ -20,10 +20,6 @@ func (b BooleanLiteral) String() string {
 	return fmt.Sprintf("%v", b.value)
 }
 
-func (b *BooleanLiteral) Value() interface{} {
-	return b.value
-}
-
 func (b *BooleanLiteral) BoolValue() bool {
 	return b.value
 }

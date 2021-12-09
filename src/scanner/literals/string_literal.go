@@ -16,10 +16,6 @@ func (s StringLiteral) String() string {
 	return "'" + s.value + "'"
 }
 
-func (s *StringLiteral) Value() interface{} {
-	return s.value
-}
-
 func (s *StringLiteral) StringValue() string {
 	return s.value
 }

@@ -16,10 +16,6 @@ func (n NilLiteral) String() string {
 	return n.value
 }
 
-func (n *NilLiteral) Value() interface{} {
-	return n.value
-}
-
 func (n *NilLiteral) NilValue() string {
 	return n.value
 }

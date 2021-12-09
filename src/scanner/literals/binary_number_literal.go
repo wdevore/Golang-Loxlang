@@ -20,10 +20,6 @@ func (b BinaryNumberLiteral) String() string {
 	return fmt.Sprintf("0b%s", b.value)
 }
 
-func (b *BinaryNumberLiteral) Value() interface{} {
-	return b.value
-}
-
 func (b *BinaryNumberLiteral) BinValue() string {
 	return b.value
 }
