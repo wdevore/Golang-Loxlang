@@ -44,7 +44,19 @@ func (i *Interpreter) VisitUnaryExpression(exprV api.IExpression) (obj interface
 
 	switch exprV.Operator().Type() {
 	case api.MINUS:
-		return -right.(float64), nil
+		v, err := i.extractNumber(right, exprV.Operator())
+		if err == nil {
+			nl := literals.NewNumberLiteralVal(-v)
+			return nl, nil
+		}
+
+		iv, err := i.extractInteger(right, exprV.Operator())
+		if err == nil {
+			nl := literals.NewIntegerLiteralVal(-iv)
+			return nl, nil
+		}
+
+		return nil, errors.NewRuntimeError(exprV.Operator(), "Minus expression invalid operand.")
 	case api.BANG:
 		return !i.isTruthy(right), nil
 	}
@@ -253,6 +265,15 @@ func (i *Interpreter) VisitBinaryExpression(exprV api.IExpression) (obj interfac
 	return nil, errors.NewRuntimeError(exprV.Operator(), "Binary expression hit unreachable code.")
 }
 
+func (i *Interpreter) extractNumber(expr interface{}, token api.IToken) (v float64, err api.IRuntimeError) {
+	ev, isNum := expr.(api.INumberLiteral)
+	if isNum {
+		return float64(ev.NumValue()), nil
+	}
+
+	return 0, errors.NewRuntimeError(token, "Operand not suitable.")
+}
+
 func (i *Interpreter) extractNumbers(left, right interface{}, token api.IToken) (lv, rv float64, err api.IRuntimeError) {
 	lfv, isNumL := left.(api.INumberLiteral)
 	rfv, isNumR := right.(api.INumberLiteral)
@@ -277,6 +298,15 @@ func (i *Interpreter) extractNumbers(left, right interface{}, token api.IToken) 
 	}
 
 	return 0, 0, errors.NewRuntimeError(token, "Operands not suitable.")
+}
+
+func (i *Interpreter) extractInteger(expr interface{}, token api.IToken) (v int, err api.IRuntimeError) {
+	ev, isInt := expr.(api.IIntegerLiteral)
+	if isInt {
+		return ev.IntValue(), nil
+	}
+
+	return 0, errors.NewRuntimeError(token, "Operand not suitable.")
 }
 
 func (i *Interpreter) extractIntegers(left, right interface{}, token api.IToken) (lv, rv int, err api.IRuntimeError) {
@@ -316,13 +346,15 @@ func (i *Interpreter) extractStrings(left, right interface{}, token api.IToken) 
 // 	return false
 // }
 
+// false and nil are falsey and everything else is truthy
 func (i *Interpreter) isTruthy(obj interface{}) bool {
 	if obj == nil {
 		return false
 	}
 
-	if value, ok := obj.(bool); ok {
-		return value
+	v, isBoo := obj.(api.IBooleanLiteral)
+	if isBoo {
+		return v.BoolValue()
 	}
 
 	return true
