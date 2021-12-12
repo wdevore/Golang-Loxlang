@@ -23,7 +23,8 @@ type Assembler struct {
 
 	report api.IReporter
 
-	expression  api.IExpression
+	// expression  api.IExpression
+	statements  []api.IStatement
 	interpreter api.IInterpreter
 }
 
@@ -92,12 +93,12 @@ func (a *Assembler) Run(source string) error {
 
 	parser := parser.NewParser(a, tokens)
 
-	a.expression, err = parser.Parse()
+	a.statements, err = parser.Parse()
 	if err != nil {
 		return fmt.Errorf("unexpected error occurred during parser: %v", err)
 	}
 
-	rerr := a.interpreter.Interpret(a.expression)
+	rerr := a.interpreter.Interpret(a.statements)
 
 	if rerr != nil {
 		return fmt.Errorf("unexpected error occurred during interpreting: %v", rerr)
@@ -106,11 +107,11 @@ func (a *Assembler) Run(source string) error {
 	return nil
 }
 
-func (a *Assembler) Print() {
-	astPrinter := interpreter.NewAstPrinter().(*interpreter.AstPrinter)
-	pretty := astPrinter.Print(a.expression)
-	log.Println(pretty)
-}
+// func (a *Assembler) Print() {
+// 	astPrinter := interpreter.NewAstPrinter().(*interpreter.AstPrinter)
+// 	pretty := astPrinter.Print(a.expression)
+// 	log.Println(pretty)
+// }
 
 func (a *Assembler) loadProperties(configRelPath string) (properties api.IProperties, err error) {
 	dataPath, err := filepath.Abs(configRelPath)

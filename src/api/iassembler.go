@@ -15,5 +15,5 @@ type IAssembler interface {
 	// The main process
 	Run(source string) error
 
-	Print()
+	// Print()
 }

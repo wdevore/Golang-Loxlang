@@ -39,7 +39,7 @@ func run_assembler() {
 		}
 	}
 
-	assembler.Print()
+	// assembler.Print()
 
 	log.Println("Assembly done.")
 }

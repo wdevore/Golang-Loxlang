@@ -15,13 +15,14 @@ const (
 	LEFT_BRACKET // "["
 	RIGHT_BRACKET
 	COMMA
+	SEMICOLON
 	DOT
 	MINUS
 	PLUS
 	SLASH // forward slash "/"
 	STAR
-	FALSE
 	TRUE
+	FALSE
 	NIL
 
 	// One or two character tokens.
@@ -41,6 +42,7 @@ const (
 	NUMBER
 
 	// Keywords.
+	PRINT
 	CONST
 	IMPORT
 	CODE
@@ -148,6 +150,8 @@ func (t TokenType) String() string {
 		return "]"
 	case COMMA:
 		return ","
+	case SEMICOLON:
+		return ";"
 	case DOT:
 		return "."
 	case MINUS:

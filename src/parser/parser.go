@@ -6,6 +6,7 @@ import (
 	"github.com/wdevore/RISCV-Meta-Assembler/src/api"
 	"github.com/wdevore/RISCV-Meta-Assembler/src/interpreter"
 	"github.com/wdevore/RISCV-Meta-Assembler/src/scanner/literals"
+	"github.com/wdevore/RISCV-Meta-Assembler/src/statements"
 )
 
 type Parser struct {
@@ -21,12 +22,26 @@ func NewParser(assembler api.IAssembler, tokens []api.IToken) *Parser {
 	return o
 }
 
-func (p *Parser) Parse() (expr api.IExpression, err error) {
-	expr, err = p.expression()
-	if err != nil {
-		p.assembler.SetError(true)
+func (p *Parser) Parse() (statements []api.IStatement, err error) {
+	statements = []api.IStatement{}
+
+	for !p.isAtEnd() {
+		statement, err := p.statement()
+		if err != nil {
+			return nil, err
+		}
+		statements = append(statements, statement)
 	}
-	return expr, err
+
+	return statements, nil
+}
+
+func (p *Parser) statement() (expr api.IStatement, err error) {
+	if p.match(api.PRINT) {
+		return p.printStatement()
+	}
+
+	return p.expressionStatement()
 }
 
 func (p *Parser) expression() (expr api.IExpression, err error) {
@@ -56,7 +71,7 @@ func (p *Parser) equality() (expr api.IExpression, err error) {
 
 // This checks to see if the current token has any of the given types.
 // If so, it consumes the token and returns true.
-// Otherwise, it returns false and leavesthe current token alone
+// Otherwise, it returns false and leaves the current token alone
 func (p *Parser) match(types ...api.TokenType) bool {
 	for _, ttype := range types {
 		if p.check(ttype) {
@@ -330,3 +345,45 @@ func (p *Parser) synchronize() {
 
 	p.advance()
 }
+
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// Statement handlers
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+// --------------------------------------------------------
+// Print statement
+// --------------------------------------------------------
+func (p *Parser) printStatement() (statement api.IStatement, err error) {
+	value, err := p.expression()
+
+	if err != nil {
+		return nil, err
+	}
+
+	p.consume(api.SEMICOLON, "Expect ';' after value.")
+
+	return statements.NewPrintStatement(value), nil
+}
+
+// --------------------------------------------------------
+// Expression statement
+// --------------------------------------------------------
+func (p *Parser) expressionStatement() (statement api.IStatement, err error) {
+	expr, err := p.expression()
+
+	if err != nil {
+		return nil, err
+	}
+
+	p.consume(api.SEMICOLON, "Expect ';' after expression.")
+
+	return statements.NewExpressionStatement(expr), nil
+}
+
+// func (p *Parser) Parse() (expr api.IExpression, err error) {
+// 	expr, err = p.expression()
+// 	if err != nil {
+// 		p.assembler.SetError(true)
+// 	}
+// 	return expr, err
+// }

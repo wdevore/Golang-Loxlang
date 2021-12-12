@@ -1,7 +1,7 @@
 package interpreter
 
 import (
-	"log"
+	"fmt"
 
 	"github.com/wdevore/RISCV-Meta-Assembler/src/api"
 	"github.com/wdevore/RISCV-Meta-Assembler/src/errors"
@@ -17,16 +17,32 @@ func NewInterpreter() api.IInterpreter {
 }
 
 // IInterpreter interface method
-func (i *Interpreter) Interpret(expression api.IExpression) api.IRuntimeError {
-	value, err := i.evaluate(expression)
-	if err != nil {
-		return err
+func (i *Interpreter) Interpret(statements []api.IStatement) api.IRuntimeError {
+	for _, statement := range statements {
+		err := i.execute(statement)
+		if err != nil {
+			return err
+		}
 	}
-
-	log.Println(value)
 
 	return nil
 }
+
+// statement analogue to the evaluate() method we have for expressions
+func (i *Interpreter) execute(statement api.IStatement) api.IRuntimeError {
+	return statement.Accept(i)
+}
+
+// func (i *Interpreter) Interpret(expression api.IExpression) api.IRuntimeError {
+// 	value, err := i.evaluate(expression)
+// 	if err != nil {
+// 		return err
+// 	}
+
+// 	log.Println(value)
+
+// 	return nil
+// }
 
 func (i *Interpreter) VisitLiteralExpression(exprV api.IExpression) (obj interface{}, err api.IRuntimeError) {
 	return exprV.Value(), nil
@@ -263,6 +279,22 @@ func (i *Interpreter) VisitBinaryExpression(exprV api.IExpression) (obj interfac
 
 	// Unreachable
 	return nil, errors.NewRuntimeError(exprV.Operator(), "Binary expression hit unreachable code.")
+}
+
+// -- ~~ -- ~~ -- ~~ -- ~~ -- ~~ -- ~~ -- ~~ -- ~~ -- ~~ --
+// IVisitorStatement implementations
+// -- ~~ -- ~~ -- ~~ -- ~~ -- ~~ -- ~~ -- ~~ -- ~~ -- ~~ --
+func (i *Interpreter) VisitExpressionStatement(statement api.IStatement) (err api.IRuntimeError) {
+	_, err = i.evaluate(statement.Expression())
+	return err
+}
+
+func (i *Interpreter) VisitPrintStatement(statement api.IStatement) (err api.IRuntimeError) {
+	value, err := i.evaluate(statement.Expression())
+
+	fmt.Println(value)
+
+	return err
 }
 
 func (i *Interpreter) extractNumber(expr interface{}, token api.IToken) (v float64, err api.IRuntimeError) {

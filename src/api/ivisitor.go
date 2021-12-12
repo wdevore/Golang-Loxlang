@@ -6,3 +6,7 @@ type IVisitor interface {
 	VisitLiteralExpression(IExpression) (obj interface{}, err IRuntimeError)
 	VisitUnaryExpression(IExpression) (obj interface{}, err IRuntimeError)
 }
+
+type IVisitorStatement interface {
+	VisitPrintStatement(IStatement) (err IRuntimeError)
+}

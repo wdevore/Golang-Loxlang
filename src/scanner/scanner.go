@@ -81,6 +81,8 @@ func (s *Scanner) scanToken() {
 		s.addTokenNullLiteral(api.RIGHT_BRACKET)
 	case ",":
 		s.addTokenNullLiteral(api.COMMA)
+	case ";":
+		s.addTokenNullLiteral(api.SEMICOLON)
 	case ".":
 		s.addTokenNullLiteral(api.DOT)
 	case "-":

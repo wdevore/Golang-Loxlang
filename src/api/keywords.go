@@ -3,6 +3,9 @@ package api
 var Keywords = map[string]TokenType{
 	"const":    CONST,
 	"import":   IMPORT,
+	"print":    PRINT,
+	"true":     TRUE,
+	"false":    FALSE,
 	"code":     CODE,
 	"alignTo":  ALIGN_TO,
 	"global":   GLOBAL,
