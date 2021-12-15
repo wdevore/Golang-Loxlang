@@ -43,6 +43,7 @@ const (
 
 	// Keywords.
 	PRINT
+	VAR
 	CONST
 	IMPORT
 	CODE

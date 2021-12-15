@@ -1,12 +1,9 @@
 package api
 
-type IVisitor interface {
+type IVisitorExpression interface {
 	VisitBinaryExpression(IExpression) (obj interface{}, err IRuntimeError)
 	VisitGroupingExpression(IExpression) (obj interface{}, err IRuntimeError)
 	VisitLiteralExpression(IExpression) (obj interface{}, err IRuntimeError)
 	VisitUnaryExpression(IExpression) (obj interface{}, err IRuntimeError)
-}
-
-type IVisitorStatement interface {
-	VisitPrintStatement(IStatement) (err IRuntimeError)
+	VisitVariableExpression(IExpression) (obj interface{}, err IRuntimeError)
 }

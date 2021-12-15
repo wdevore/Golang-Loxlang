@@ -26,7 +26,8 @@ func (p *Parser) Parse() (statements []api.IStatement, err error) {
 	statements = []api.IStatement{}
 
 	for !p.isAtEnd() {
-		statement, err := p.statement()
+		statement, err := p.declaration()
+		// statement, err := p.statement()
 		if err != nil {
 			return nil, err
 		}
@@ -34,6 +35,18 @@ func (p *Parser) Parse() (statements []api.IStatement, err error) {
 	}
 
 	return statements, nil
+}
+
+func (p *Parser) declaration() (expr api.IStatement, err error) {
+	if p.match(api.VAR) {
+		statement, err := p.varDeclaration()
+		if err != nil {
+			p.synchronize()
+		}
+		return statement, err
+	}
+
+	return p.statement()
 }
 
 func (p *Parser) statement() (expr api.IStatement, err error) {
@@ -46,6 +59,31 @@ func (p *Parser) statement() (expr api.IStatement, err error) {
 
 func (p *Parser) expression() (expr api.IExpression, err error) {
 	return p.equality()
+}
+
+// The parser has already matched the var token,
+// so next it requires and consumes an identifier token for the variable name.
+func (p *Parser) varDeclaration() (expr api.IStatement, err error) {
+	name, err := p.consume(api.IDENTIFIER, "Expect variable name.")
+	if err != nil {
+		return nil, err
+	}
+
+	var initializer api.IExpression
+
+	if p.match(api.EQUAL) {
+		initializer, err = p.expression()
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	_, err = p.consume(api.SEMICOLON, "Expect ';' after variable declaration.")
+	if err != nil {
+		return nil, err
+	}
+
+	return statements.NewVarStatement(name, initializer), nil
 }
 
 // --------------------------------------------------------
@@ -89,6 +127,7 @@ func (p *Parser) check(ttype api.TokenType) bool {
 		return false
 	}
 
+	// fmt.Println("parser check: ", p.peek().Type(), " -> ", ttype)
 	return p.peek().Type() == ttype
 }
 
@@ -197,9 +236,6 @@ func (p *Parser) unary() (expr api.IExpression, err error) {
 	return p.primary()
 }
 
-// --------------------------------------------------------
-// primary → NUMBER | STRING | "true" | "false" | "nil" | "(" expression ")"
-// --------------------------------------------------------
 func (p *Parser) primary() (expr api.IExpression, err error) {
 
 	if p.match(api.FALSE) {
@@ -215,6 +251,11 @@ func (p *Parser) primary() (expr api.IExpression, err error) {
 	if p.match(api.NUMBER, api.STRING) {
 		// NOTE: may need to copy the literal!!!!
 		return interpreter.NewLiteralExpression(p.previous().Literal()), nil
+	}
+
+	// Parsing a variable expression
+	if p.match(api.IDENTIFIER) {
+		return interpreter.NewVariableExpression(p.previous()), nil
 	}
 
 	if p.match(api.LEFT_PAREN) {
@@ -379,6 +420,21 @@ func (p *Parser) expressionStatement() (statement api.IStatement, err error) {
 
 	return statements.NewExpressionStatement(expr), nil
 }
+
+// --------------------------------------------------------
+// Expression statement
+// --------------------------------------------------------
+// func (p *Parser) varStatement() (statement api.IStatement, err error) {
+// 	expr, err := p.expression()
+
+// 	if err != nil {
+// 		return nil, err
+// 	}
+
+// 	p.consume(api.SEMICOLON, "Expect ';' after expression.")
+
+// 	return statements.NewExpressionStatement(expr), nil
+// }
 
 // func (p *Parser) Parse() (expr api.IExpression, err error) {
 // 	expr, err = p.expression()

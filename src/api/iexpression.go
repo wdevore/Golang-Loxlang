@@ -1,7 +1,7 @@
 package api
 
 type IExpression interface {
-	Accept(IVisitor) (obj interface{}, err IRuntimeError)
+	Accept(IVisitorExpression) (obj interface{}, err IRuntimeError)
 
 	// Literals
 	Value() interface{}
@@ -13,4 +13,7 @@ type IExpression interface {
 
 	// Grouping
 	Expression() IExpression
+
+	// Var
+	Name() IToken
 }

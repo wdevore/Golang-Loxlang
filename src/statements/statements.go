@@ -23,6 +23,14 @@ func (s *ExpressionStatement) Expression() api.IExpression {
 	return s.expression
 }
 
+func (s *ExpressionStatement) Initializer() api.IExpression {
+	return nil
+}
+
+func (s *ExpressionStatement) Name() api.IToken {
+	return nil
+}
+
 // ---------------------------------------------------
 // Print statement
 // ---------------------------------------------------
@@ -44,23 +52,41 @@ func (s *PrintStatement) Expression() api.IExpression {
 	return s.expression
 }
 
+func (s *PrintStatement) Initializer() api.IExpression {
+	return nil
+}
+
+func (s *PrintStatement) Name() api.IToken {
+	return nil
+}
+
 // ---------------------------------------------------
-// Block statement
+// var statement
 // ---------------------------------------------------
-// type BlockStatement struct {
-// 	statements []api.IExpression
-// }
+type VarStatement struct {
+	name        api.IToken
+	initializer api.IExpression
+}
 
-// func NewBlockStatement(statements []api.IExpression) api.IStatement {
-// 	o := new(BlockStatement)
-// 	o.statements = statements
-// 	return o
-// }
+func NewVarStatement(name api.IToken, initializer api.IExpression) api.IStatement {
+	o := new(VarStatement)
+	o.name = name
+	o.initializer = initializer
+	return o
+}
 
-// func (s *BlockStatement) Accept(visitor api.IVisitorStatement) (obj interface{}, err api.IRuntimeError) {
-// 	return nil, nil
-// }
+func (s *VarStatement) Accept(visitor api.IVisitorStatement) (err api.IRuntimeError) {
+	return visitor.VisitVariableStatement(s)
+}
 
-// func (s *BlockStatement) Expression() api.IExpression {
-// 	return nil
-// }
+func (s *VarStatement) Expression() api.IExpression {
+	return nil
+}
+
+func (s *VarStatement) Initializer() api.IExpression {
+	return s.initializer
+}
+
+func (s *VarStatement) Name() api.IToken {
+	return s.name
+}

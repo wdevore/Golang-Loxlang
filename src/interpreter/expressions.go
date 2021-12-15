@@ -19,7 +19,7 @@ func NewBinaryExpression(left api.IExpression, operator api.IToken, right api.IE
 	return e
 }
 
-func (e *BinaryExpression) Accept(visitor api.IVisitor) (obj interface{}, err api.IRuntimeError) {
+func (e *BinaryExpression) Accept(visitor api.IVisitorExpression) (obj interface{}, err api.IRuntimeError) {
 	return visitor.VisitBinaryExpression(e)
 }
 
@@ -43,6 +43,10 @@ func (e *BinaryExpression) Expression() api.IExpression {
 	return nil
 }
 
+func (e *BinaryExpression) Name() api.IToken {
+	return nil
+}
+
 // ---------------------------------------------------
 // Grouping
 // ---------------------------------------------------
@@ -56,7 +60,7 @@ func NewGroupingExpression(expression api.IExpression) api.IExpression {
 	return e
 }
 
-func (e *GroupingExpression) Accept(visitor api.IVisitor) (obj interface{}, err api.IRuntimeError) {
+func (e *GroupingExpression) Accept(visitor api.IVisitorExpression) (obj interface{}, err api.IRuntimeError) {
 	return visitor.VisitGroupingExpression(e)
 }
 
@@ -80,6 +84,10 @@ func (e *GroupingExpression) Expression() api.IExpression {
 	return e.expression
 }
 
+func (e *GroupingExpression) Name() api.IToken {
+	return nil
+}
+
 // ---------------------------------------------------
 // Literal
 // ---------------------------------------------------
@@ -93,7 +101,7 @@ func NewLiteralExpression(value api.ILiteral) api.IExpression {
 	return e
 }
 
-func (e *LiteralExpression) Accept(visitor api.IVisitor) (obj interface{}, err api.IRuntimeError) {
+func (e *LiteralExpression) Accept(visitor api.IVisitorExpression) (obj interface{}, err api.IRuntimeError) {
 	return visitor.VisitLiteralExpression(e)
 }
 
@@ -117,6 +125,10 @@ func (e *LiteralExpression) Expression() api.IExpression {
 	return nil
 }
 
+func (e *LiteralExpression) Name() api.IToken {
+	return nil
+}
+
 // ---------------------------------------------------
 // Unary
 // ---------------------------------------------------
@@ -132,7 +144,7 @@ func NewUnaryExpression(operator api.IToken, right api.IExpression) api.IExpress
 	return e
 }
 
-func (e *UnaryExpression) Accept(visitor api.IVisitor) (obj interface{}, err api.IRuntimeError) {
+func (e *UnaryExpression) Accept(visitor api.IVisitorExpression) (obj interface{}, err api.IRuntimeError) {
 	return visitor.VisitUnaryExpression(e)
 }
 
@@ -156,47 +168,47 @@ func (e *UnaryExpression) Expression() api.IExpression {
 	return nil
 }
 
-/*
-abstract class Expr {
-	// defineVisitor
-	interface Visitor<R> {
-		R visitBinaryExpr(Binary expr);
-		R visitGroupingExpr(Grouping expr);
-		// ...
-	}
-
-	// loop defineType
-	static class Binary extends Expr {
-		Binary(left, op, right) {
-			this.left = left;
-			this.op = op;
-			this.right = right;
-		}
-		@override
-		<R> R accept(Visitor<R> visitor) {
-			return visitor.visitBinaryExpr(this);
-		}
-
-		// Field
-		final left
-		final op
-		final right
-	}
-
-	static class Grouping extends Expr {
-		Grouping(expr) {
-			this.expr = expr
-		}
-		@override
-		<R> R accept(Visitor<R> visitor) {
-			return visitor.visitGroupingExpr(this);
-		}
-
-		// Field
-		final expr
-	}
-	//...
-
-	abstract <R> R accept(Visitor<R> visitor);
+func (e *UnaryExpression) Name() api.IToken {
+	return nil
 }
-*/
+
+// ---------------------------------------------------
+// Variable
+// ---------------------------------------------------
+type VariableExpression struct {
+	name api.IToken
+}
+
+func NewVariableExpression(name api.IToken) api.IExpression {
+	e := new(VariableExpression)
+	e.name = name
+	return e
+}
+
+func (e *VariableExpression) Accept(visitor api.IVisitorExpression) (obj interface{}, err api.IRuntimeError) {
+	return visitor.VisitVariableExpression(e)
+}
+
+func (e *VariableExpression) Value() interface{} {
+	return nil
+}
+
+func (e *VariableExpression) Left() api.IExpression {
+	return nil
+}
+
+func (e *VariableExpression) Operator() api.IToken {
+	return nil
+}
+
+func (e *VariableExpression) Right() api.IExpression {
+	return nil
+}
+
+func (e *VariableExpression) Expression() api.IExpression {
+	return nil
+}
+
+func (e *VariableExpression) Name() api.IToken {
+	return e.name
+}

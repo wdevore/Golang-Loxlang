@@ -9,10 +9,12 @@ import (
 )
 
 type Interpreter struct {
+	environment api.IEnvironment
 }
 
 func NewInterpreter() api.IInterpreter {
 	o := new(Interpreter)
+	o.environment = NewEnvironment()
 	return o
 }
 
@@ -44,6 +46,9 @@ func (i *Interpreter) execute(statement api.IStatement) api.IRuntimeError {
 // 	return nil
 // }
 
+// -- ~~ -- ~~ -- ~~ -- ~~ -- ~~ -- ~~ -- ~~ -- ~~ -- ~~ --
+// IVisitorExpression interface
+// -- ~~ -- ~~ -- ~~ -- ~~ -- ~~ -- ~~ -- ~~ -- ~~ -- ~~ --
 func (i *Interpreter) VisitLiteralExpression(exprV api.IExpression) (obj interface{}, err api.IRuntimeError) {
 	return exprV.Value(), nil
 }
@@ -281,10 +286,15 @@ func (i *Interpreter) VisitBinaryExpression(exprV api.IExpression) (obj interfac
 	return nil, errors.NewRuntimeError(exprV.Operator(), "Binary expression hit unreachable code.")
 }
 
+func (i *Interpreter) VisitVariableExpression(exprV api.IExpression) (obj interface{}, err api.IRuntimeError) {
+	return i.environment.Get(exprV.Name())
+}
+
 // -- ~~ -- ~~ -- ~~ -- ~~ -- ~~ -- ~~ -- ~~ -- ~~ -- ~~ --
 // IVisitorStatement implementations
 // -- ~~ -- ~~ -- ~~ -- ~~ -- ~~ -- ~~ -- ~~ -- ~~ -- ~~ --
 func (i *Interpreter) VisitExpressionStatement(statement api.IStatement) (err api.IRuntimeError) {
+	// Simple decend
 	_, err = i.evaluate(statement.Expression())
 	return err
 }
@@ -295,6 +305,19 @@ func (i *Interpreter) VisitPrintStatement(statement api.IStatement) (err api.IRu
 	fmt.Println(value)
 
 	return err
+}
+
+func (i *Interpreter) VisitVariableStatement(statement api.IStatement) (err api.IRuntimeError) {
+	var value interface{} = nil
+
+	if statement.Initializer() != nil {
+		value, err = i.evaluate(statement.Initializer())
+		if err != nil {
+			return err
+		}
+	}
+
+	return i.environment.Define(statement.Name().Lexeme(), value)
 }
 
 func (i *Interpreter) extractNumber(expr interface{}, token api.IToken) (v float64, err api.IRuntimeError) {

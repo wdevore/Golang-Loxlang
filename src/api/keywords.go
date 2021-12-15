@@ -4,6 +4,7 @@ var Keywords = map[string]TokenType{
 	"const":    CONST,
 	"import":   IMPORT,
 	"print":    PRINT,
+	"var":      VAR,
 	"true":     TRUE,
 	"false":    FALSE,
 	"code":     CODE,

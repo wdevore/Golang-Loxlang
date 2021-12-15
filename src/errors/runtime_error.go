@@ -27,5 +27,9 @@ func (r *RuntimeError) Message() string {
 }
 
 func (r RuntimeError) String() string {
-	return fmt.Sprintf("[line %d] %s", r.token.Line(), r.message)
+	if r.token != nil {
+		return fmt.Sprintf("[line %d] %s", r.token.Line(), r.message)
+	}
+
+	return r.message
 }

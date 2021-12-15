@@ -5,7 +5,7 @@ import "github.com/wdevore/RISCV-Meta-Assembler/src/api"
 type AstPrinter struct {
 }
 
-func NewAstPrinter() api.IVisitor {
+func NewAstPrinter() api.IVisitorExpression {
 	o := new(AstPrinter)
 	return o
 }
@@ -16,6 +16,9 @@ func (a *AstPrinter) Print(expr api.IExpression) string {
 	return obj.(string)
 }
 
+// -- ~~ -- ~~ -- ~~ -- ~~ -- ~~ -- ~~ -- ~~ -- ~~ -- ~~ --
+// IVisitorExpression interface
+// -- ~~ -- ~~ -- ~~ -- ~~ -- ~~ -- ~~ -- ~~ -- ~~ -- ~~ --
 func (a *AstPrinter) VisitBinaryExpression(exprV api.IExpression) (obj interface{}, err api.IRuntimeError) {
 	expr := exprV.(*BinaryExpression)
 	return a.parenthesize(expr.operator.Lexeme(), expr.left, expr.right), nil
@@ -39,9 +42,15 @@ func (a *AstPrinter) VisitUnaryExpression(exprV api.IExpression) (obj interface{
 	return a.parenthesize(expr.operator.Lexeme(), expr.right), nil
 }
 
-func (a *AstPrinter) Value() interface{} {
-	return nil
+func (a *AstPrinter) VisitVariableExpression(exprV api.IExpression) (obj interface{}, err api.IRuntimeError) {
+	return nil, nil
 }
+
+// *************************************
+
+// func (a *AstPrinter) Value() interface{} {
+// 	return nil
+// }
 
 func (a *AstPrinter) parenthesize(name string, expr ...interface{}) string {
 	builder := "(" + name
