@@ -2,6 +2,7 @@ package interpreter
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/wdevore/RISCV-Meta-Assembler/src/api"
 	"github.com/wdevore/RISCV-Meta-Assembler/src/errors"
@@ -290,6 +291,24 @@ func (i *Interpreter) VisitVariableExpression(exprV api.IExpression) (obj interf
 	return i.environment.Get(exprV.Name())
 }
 
+func (i *Interpreter) VisitAssignExpression(exprV api.IExpression) (obj interface{}, err api.IRuntimeError) {
+	if exprV.Type() == api.ASSIGN_EXPR {
+		value, err := i.evaluate(exprV.Expression())
+		if err != nil {
+			return nil, err
+		}
+
+		err = i.environment.Assign(exprV.Name(), value)
+		if err != nil {
+			return nil, err
+		}
+
+		return value, nil
+	}
+
+	return nil, errors.NewRuntimeError(exprV.Name(), "Assignment is not an expression.")
+}
+
 // -- ~~ -- ~~ -- ~~ -- ~~ -- ~~ -- ~~ -- ~~ -- ~~ -- ~~ --
 // IVisitorStatement implementations
 // -- ~~ -- ~~ -- ~~ -- ~~ -- ~~ -- ~~ -- ~~ -- ~~ -- ~~ --
@@ -302,7 +321,11 @@ func (i *Interpreter) VisitExpressionStatement(statement api.IStatement) (err ap
 func (i *Interpreter) VisitPrintStatement(statement api.IStatement) (err api.IRuntimeError) {
 	value, err := i.evaluate(statement.Expression())
 
-	fmt.Println(value)
+	if err == nil {
+		fmt.Println(value)
+	} else {
+		log.Println(err)
+	}
 
 	return err
 }
@@ -418,43 +441,3 @@ func (i *Interpreter) isTruthy(obj interface{}) bool {
 func (i *Interpreter) evaluate(expr api.IExpression) (obj interface{}, err api.IRuntimeError) {
 	return expr.Accept(i)
 }
-
-// func (i *Interpreter) checkNumberOperand(token api.IToken, obj interface{}) (err api.IRuntimeError) {
-// 	_, okF := obj.(float64)
-// 	_, okI := obj.(int)
-
-// 	if okF || okI {
-// 		return nil
-// 	}
-
-// 	return errors.NewRuntimeError(token, "Operand must be a number.")
-// }
-
-// func (i *Interpreter) checkNumberOperands(token api.IToken, left, right interface{}) (err api.IRuntimeError) {
-// 	_, okL := left.(float64)
-// 	_, okR := right.(float64)
-
-// 	if okL && okR {
-// 		return nil
-// 	}
-
-// 	_, okL = left.(int)
-// 	_, okR = right.(int)
-
-// 	if okL && okR {
-// 		return nil
-// 	}
-
-// 	return errors.NewRuntimeError(token, "Operands must be a numbers.")
-// }
-
-// nmf := reflect.TypeOf(new(api.INumberLiteral)).Elem()
-// hxf := reflect.TypeOf(new(api.IHexNumberLiteral)).Elem()
-
-// t := reflect.TypeOf(left)
-// if t.Implements(nmf) {
-// 	fmt.Println(t)
-// }
-// if t.Implements(hxf) {
-// 	fmt.Println(t)
-// }

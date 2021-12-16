@@ -6,4 +6,5 @@ type IVisitorExpression interface {
 	VisitLiteralExpression(IExpression) (obj interface{}, err IRuntimeError)
 	VisitUnaryExpression(IExpression) (obj interface{}, err IRuntimeError)
 	VisitVariableExpression(IExpression) (obj interface{}, err IRuntimeError)
+	VisitAssignExpression(IExpression) (obj interface{}, err IRuntimeError)
 }

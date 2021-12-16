@@ -33,3 +33,13 @@ func (e *Environment) Get(name api.IToken) (obj interface{}, err api.IRuntimeErr
 
 	return nil, errors.NewRuntimeError(nil, "Undefined variable '"+name.Lexeme()+"'.")
 }
+
+func (e *Environment) Assign(name api.IToken, obj interface{}) (err api.IRuntimeError) {
+	_, ok := e.values[name.Lexeme()]
+	if ok {
+		e.values[name.Lexeme()] = obj
+		return nil
+	}
+
+	return errors.NewRuntimeError(nil, "Undefined variable '"+name.Lexeme()+"'.")
+}

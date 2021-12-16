@@ -16,7 +16,7 @@ func NewExpressionStatement(expression api.IExpression) api.IStatement {
 }
 
 func (s *ExpressionStatement) Accept(visitor api.IVisitorStatement) (err api.IRuntimeError) {
-	return nil
+	return visitor.VisitExpressionStatement(s)
 }
 
 func (s *ExpressionStatement) Expression() api.IExpression {

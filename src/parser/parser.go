@@ -27,7 +27,6 @@ func (p *Parser) Parse() (statements []api.IStatement, err error) {
 
 	for !p.isAtEnd() {
 		statement, err := p.declaration()
-		// statement, err := p.statement()
 		if err != nil {
 			return nil, err
 		}
@@ -42,6 +41,7 @@ func (p *Parser) declaration() (expr api.IStatement, err error) {
 		statement, err := p.varDeclaration()
 		if err != nil {
 			p.synchronize()
+			return nil, err
 		}
 		return statement, err
 	}
@@ -58,7 +58,39 @@ func (p *Parser) statement() (expr api.IStatement, err error) {
 }
 
 func (p *Parser) expression() (expr api.IExpression, err error) {
-	return p.equality()
+	return p.assignment()
+}
+
+func (p *Parser) assignment() (expr api.IExpression, err error) {
+	// parse the left-hand side, which can be any
+	// expression of higher precedence
+	expr, err = p.equality()
+
+	if err != nil {
+		return nil, err
+	}
+
+	if p.match(api.EQUAL) {
+		// parse the right-hand side
+		// and then wrap it all up in an assignment expression
+		equals := p.previous()
+		value, err := p.assignment()
+
+		if err != nil {
+			return nil, err
+		}
+
+		if expr.Type() == api.VAR_EXPR {
+			name := expr.Name()
+			return interpreter.NewAssignExpression(name, value), nil
+		}
+
+		// TODO create a NewParseError
+		return nil, errors.New(equals.String() + " : Invalid assignment target.")
+		// return nil, errors.NewRuntimeError(equals, "Invalid assignment target.")
+	}
+
+	return expr, nil
 }
 
 // The parser has already matched the var token,
@@ -401,7 +433,11 @@ func (p *Parser) printStatement() (statement api.IStatement, err error) {
 		return nil, err
 	}
 
-	p.consume(api.SEMICOLON, "Expect ';' after value.")
+	_, err = p.consume(api.SEMICOLON, "Expect ';' after value.")
+
+	if err != nil {
+		return nil, err
+	}
 
 	return statements.NewPrintStatement(value), nil
 }
@@ -416,7 +452,11 @@ func (p *Parser) expressionStatement() (statement api.IStatement, err error) {
 		return nil, err
 	}
 
-	p.consume(api.SEMICOLON, "Expect ';' after expression.")
+	_, err = p.consume(api.SEMICOLON, "Expect ';' after expression.")
+
+	if err != nil {
+		return nil, err
+	}
 
 	return statements.NewExpressionStatement(expr), nil
 }
