@@ -36,16 +36,9 @@ func (i *Interpreter) execute(statement api.IStatement) api.IRuntimeError {
 	return statement.Accept(i)
 }
 
-// func (i *Interpreter) Interpret(expression api.IExpression) api.IRuntimeError {
-// 	value, err := i.evaluate(expression)
-// 	if err != nil {
-// 		return err
-// 	}
-
-// 	log.Println(value)
-
-// 	return nil
-// }
+func (i *Interpreter) evaluate(expr api.IExpression) (obj interface{}, err api.IRuntimeError) {
+	return expr.Accept(i)
+}
 
 // -- ~~ -- ~~ -- ~~ -- ~~ -- ~~ -- ~~ -- ~~ -- ~~ -- ~~ --
 // IVisitorExpression interface
@@ -306,14 +299,14 @@ func (i *Interpreter) VisitAssignExpression(exprV api.IExpression) (obj interfac
 		return value, nil
 	}
 
-	return nil, errors.NewRuntimeError(exprV.Name(), "Expression is no an Assignment.")
+	return nil, errors.NewRuntimeError(exprV.Name(), "Expression is not an Assignment.")
 }
 
 // -- ~~ -- ~~ -- ~~ -- ~~ -- ~~ -- ~~ -- ~~ -- ~~ -- ~~ --
 // IVisitorStatement implementations
 // -- ~~ -- ~~ -- ~~ -- ~~ -- ~~ -- ~~ -- ~~ -- ~~ -- ~~ --
 func (i *Interpreter) VisitExpressionStatement(statement api.IStatement) (err api.IRuntimeError) {
-	// Simple decend
+	// Simply decend
 	_, err = i.evaluate(statement.Expression())
 	return err
 }
@@ -436,8 +429,4 @@ func (i *Interpreter) isTruthy(obj interface{}) bool {
 	}
 
 	return true
-}
-
-func (i *Interpreter) evaluate(expr api.IExpression) (obj interface{}, err api.IRuntimeError) {
-	return expr.Accept(i)
 }
