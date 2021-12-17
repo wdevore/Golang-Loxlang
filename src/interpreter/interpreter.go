@@ -293,7 +293,7 @@ func (i *Interpreter) VisitVariableExpression(exprV api.IExpression) (obj interf
 
 func (i *Interpreter) VisitAssignExpression(exprV api.IExpression) (obj interface{}, err api.IRuntimeError) {
 	if exprV.Type() == api.ASSIGN_EXPR {
-		value, err := i.evaluate(exprV.Expression())
+		value, err := i.evaluate(exprV.Expression()) // i.e. exprV.Value()
 		if err != nil {
 			return nil, err
 		}
@@ -306,7 +306,7 @@ func (i *Interpreter) VisitAssignExpression(exprV api.IExpression) (obj interfac
 		return value, nil
 	}
 
-	return nil, errors.NewRuntimeError(exprV.Name(), "Assignment is not an expression.")
+	return nil, errors.NewRuntimeError(exprV.Name(), "Expression is no an Assignment.")
 }
 
 // -- ~~ -- ~~ -- ~~ -- ~~ -- ~~ -- ~~ -- ~~ -- ~~ -- ~~ --
