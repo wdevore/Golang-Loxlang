@@ -31,6 +31,43 @@ func (s *ExpressionStatement) Name() api.IToken {
 	return nil
 }
 
+func (s *ExpressionStatement) Statements() []api.IStatement {
+	return nil
+}
+
+// ---------------------------------------------------
+// Block statement
+// ---------------------------------------------------
+type BlockStatement struct {
+	statements []api.IStatement
+}
+
+func NewBlockStatement(statements []api.IStatement) api.IStatement {
+	o := new(BlockStatement)
+	o.statements = statements
+	return o
+}
+
+func (s *BlockStatement) Accept(visitor api.IVisitorStatement) (err api.IRuntimeError) {
+	return visitor.VisitBlockStatement(s)
+}
+
+func (s *BlockStatement) Expression() api.IExpression {
+	return nil
+}
+
+func (s *BlockStatement) Initializer() api.IExpression {
+	return nil
+}
+
+func (s *BlockStatement) Name() api.IToken {
+	return nil
+}
+
+func (s *BlockStatement) Statements() []api.IStatement {
+	return s.statements
+}
+
 // ---------------------------------------------------
 // Print statement
 // ---------------------------------------------------
@@ -57,6 +94,10 @@ func (s *PrintStatement) Initializer() api.IExpression {
 }
 
 func (s *PrintStatement) Name() api.IToken {
+	return nil
+}
+
+func (s *PrintStatement) Statements() []api.IStatement {
 	return nil
 }
 
@@ -89,4 +130,8 @@ func (s *VarStatement) Initializer() api.IExpression {
 
 func (s *VarStatement) Name() api.IToken {
 	return s.name
+}
+
+func (s *VarStatement) Statements() []api.IStatement {
+	return nil
 }

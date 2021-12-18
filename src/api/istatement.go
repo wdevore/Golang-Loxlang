@@ -8,4 +8,6 @@ type IStatement interface {
 	// Var statement
 	Name() IToken
 	Initializer() IExpression
+
+	Statements() []IStatement
 }

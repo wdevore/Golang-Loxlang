@@ -50,6 +50,14 @@ func (p *Parser) declaration() (expr api.IStatement, err error) {
 }
 
 func (p *Parser) statement() (expr api.IStatement, err error) {
+	if p.match(api.LEFT_BRACE) {
+		block, err := p.block()
+		if err != nil {
+			return nil, err
+		}
+		return statements.NewBlockStatement(block), nil
+	}
+
 	if p.match(api.PRINT) {
 		return p.printStatement()
 	}
@@ -459,6 +467,31 @@ func (p *Parser) expressionStatement() (statement api.IStatement, err error) {
 	}
 
 	return statements.NewExpressionStatement(expr), nil
+}
+
+// --------------------------------------------------------
+// Expression statement
+// --------------------------------------------------------
+func (p *Parser) block() (statements []api.IStatement, err error) {
+	statements = make([]api.IStatement, 0)
+
+	for !p.check(api.RIGHT_BRACE) && !p.isAtEnd() {
+		decl, err := p.declaration()
+
+		if err != nil {
+			return nil, err
+		}
+
+		statements = append(statements, decl)
+	}
+
+	_, err = p.consume(api.RIGHT_BRACE, "Expect '}' after block.")
+
+	if err != nil {
+		return nil, err
+	}
+
+	return statements, nil
 }
 
 // --------------------------------------------------------

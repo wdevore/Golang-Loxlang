@@ -4,6 +4,6 @@
         "Generate": "Ascii"
     },
     "Source": [
-        "simple_vars.S"
+        "simple_blocks.lox"
     ]
 }

@@ -36,6 +36,7 @@ func (i *Interpreter) execute(statement api.IStatement) api.IRuntimeError {
 	return statement.Accept(i)
 }
 
+// expression analogue to the execute() method we have for statements
 func (i *Interpreter) evaluate(expr api.IExpression) (obj interface{}, err api.IRuntimeError) {
 	return expr.Accept(i)
 }
@@ -336,6 +337,32 @@ func (i *Interpreter) VisitVariableStatement(statement api.IStatement) (err api.
 	return i.environment.Define(statement.Name().Lexeme(), value)
 }
 
+func (i *Interpreter) VisitBlockStatement(statement api.IStatement) (err api.IRuntimeError) {
+	parentEnv := NewEnvironmentEnclosing(i.environment)
+	return i.executeBlock(statement.Statements(), parentEnv)
+}
+
+func (i *Interpreter) executeBlock(statements []api.IStatement, parentEnv api.IEnvironment) (err api.IRuntimeError) {
+	prevEnv := i.environment
+
+	i.environment = parentEnv
+
+	for _, statement := range statements {
+		err = i.execute(statement)
+		if err != nil {
+			i.environment = prevEnv
+			return err
+		}
+	}
+
+	i.environment = prevEnv
+
+	return nil
+}
+
+// ------------------------------------------------------------
+// Extractions
+// ------------------------------------------------------------
 func (i *Interpreter) extractNumber(expr interface{}, token api.IToken) (v float64, err api.IRuntimeError) {
 	ev, isNum := expr.(api.INumberLiteral)
 	if isNum {
