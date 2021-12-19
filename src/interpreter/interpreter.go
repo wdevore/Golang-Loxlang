@@ -2,7 +2,6 @@ package interpreter
 
 import (
 	"fmt"
-	"log"
 
 	"github.com/wdevore/RISCV-Meta-Assembler/src/api"
 	"github.com/wdevore/RISCV-Meta-Assembler/src/errors"
@@ -41,11 +40,48 @@ func (i *Interpreter) evaluate(expr api.IExpression) (obj interface{}, err api.I
 	return expr.Accept(i)
 }
 
+func (i *Interpreter) executeBlock(statements []api.IStatement, parentEnv api.IEnvironment) (err api.IRuntimeError) {
+	prevEnv := i.environment
+
+	i.environment = parentEnv
+
+	for _, statement := range statements {
+		err = i.execute(statement)
+		if err != nil {
+			i.environment = prevEnv
+			return err
+		}
+	}
+
+	i.environment = prevEnv
+
+	return nil
+}
+
 // -- ~~ -- ~~ -- ~~ -- ~~ -- ~~ -- ~~ -- ~~ -- ~~ -- ~~ --
 // IVisitorExpression interface
 // -- ~~ -- ~~ -- ~~ -- ~~ -- ~~ -- ~~ -- ~~ -- ~~ -- ~~ --
 func (i *Interpreter) VisitLiteralExpression(exprV api.IExpression) (obj interface{}, err api.IRuntimeError) {
 	return exprV.Value(), nil
+}
+
+func (i *Interpreter) VisitLogicalExpression(exprV api.IExpression) (obj interface{}, err api.IRuntimeError) {
+	left, err := i.evaluate(exprV.Left())
+	if err != nil {
+		return nil, err
+	}
+
+	if exprV.Operator().Type() == api.OR {
+		if i.isTruthy(left) {
+			return left, nil
+		}
+	} else {
+		if !i.isTruthy(left) {
+			return left, nil
+		}
+	}
+
+	return i.evaluate(exprV.Right())
 }
 
 func (i *Interpreter) VisitGroupingExpression(exprV api.IExpression) (obj interface{}, err api.IRuntimeError) {
@@ -317,8 +353,6 @@ func (i *Interpreter) VisitPrintStatement(statement api.IStatement) (err api.IRu
 
 	if err == nil {
 		fmt.Println(value)
-	} else {
-		log.Println(err)
 	}
 
 	return err
@@ -342,20 +376,17 @@ func (i *Interpreter) VisitBlockStatement(statement api.IStatement) (err api.IRu
 	return i.executeBlock(statement.Statements(), parentEnv)
 }
 
-func (i *Interpreter) executeBlock(statements []api.IStatement, parentEnv api.IEnvironment) (err api.IRuntimeError) {
-	prevEnv := i.environment
-
-	i.environment = parentEnv
-
-	for _, statement := range statements {
-		err = i.execute(statement)
-		if err != nil {
-			i.environment = prevEnv
-			return err
-		}
+func (i *Interpreter) VisitIfStatement(statement api.IStatement) (err api.IRuntimeError) {
+	value, err := i.evaluate(statement.Condition())
+	if err != nil {
+		return err
 	}
 
-	i.environment = prevEnv
+	if i.isTruthy(value) {
+		i.execute(statement.ThenBranch())
+	} else if statement.ElseBranch() != nil {
+		i.execute(statement.ElseBranch())
+	}
 
 	return nil
 }
@@ -444,16 +475,22 @@ func (i *Interpreter) extractStrings(left, right interface{}, token api.IToken) 
 // 	return false
 // }
 
-// false and nil are falsey and everything else is truthy
+// "false" and "nil" are falsey and everything else is truthy
 func (i *Interpreter) isTruthy(obj interface{}) bool {
-	if obj == nil {
+	if obj == nil { // TODO This should never happen
 		return false
 	}
 
-	v, isBoo := obj.(api.IBooleanLiteral)
-	if isBoo {
-		return v.BoolValue()
+	vb, isBool := obj.(api.IBooleanLiteral)
+	if isBool {
+		return vb.BoolValue()
 	}
 
-	return true
+	_, isNil := obj.(api.INilLiteral)
+
+	if isNil {
+		return false
+	} else {
+		return true
+	}
 }

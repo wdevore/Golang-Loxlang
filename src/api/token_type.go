@@ -43,6 +43,8 @@ const (
 
 	// Keywords.
 	PRINT
+	IF
+	ELSE
 	VAR
 	CONST
 	IMPORT

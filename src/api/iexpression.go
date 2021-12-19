@@ -12,6 +12,7 @@ const (
 	UNARY_EXPR
 	VAR_EXPR
 	ASSIGN_EXPR
+	LOGIC_EXPR
 )
 
 type IExpression interface {

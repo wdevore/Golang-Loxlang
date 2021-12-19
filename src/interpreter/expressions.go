@@ -299,3 +299,55 @@ func (e *AssignExpression) Name() api.IToken {
 func (e *AssignExpression) Type() api.ExpressionType {
 	return e.eType
 }
+
+// ---------------------------------------------------
+// Logic "or", "and"
+// ---------------------------------------------------
+type LogicExpression struct {
+	eType api.ExpressionType
+
+	left     api.IExpression
+	operator api.IToken
+	right    api.IExpression
+}
+
+func NewLogicExpression(left api.IExpression, operator api.IToken, right api.IExpression) api.IExpression {
+	e := new(LogicExpression)
+	e.left = left
+	e.operator = operator
+	e.right = right
+	e.eType = api.LOGIC_EXPR
+	return e
+}
+
+func (e *LogicExpression) Accept(visitor api.IVisitorExpression) (obj interface{}, err api.IRuntimeError) {
+	return visitor.VisitLogicalExpression(e)
+}
+
+func (e *LogicExpression) Value() interface{} {
+	return nil
+}
+
+func (e *LogicExpression) Left() api.IExpression {
+	return e.left
+}
+
+func (e *LogicExpression) Operator() api.IToken {
+	return e.operator
+}
+
+func (e *LogicExpression) Right() api.IExpression {
+	return e.right
+}
+
+func (e *LogicExpression) Expression() api.IExpression {
+	return nil
+}
+
+func (e *LogicExpression) Name() api.IToken {
+	return nil
+}
+
+func (e *LogicExpression) Type() api.ExpressionType {
+	return e.eType
+}

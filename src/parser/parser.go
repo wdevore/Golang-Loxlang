@@ -58,6 +58,10 @@ func (p *Parser) statement() (expr api.IStatement, err error) {
 		return statements.NewBlockStatement(block), nil
 	}
 
+	if p.match(api.IF) {
+		return p.ifStatement()
+	}
+
 	if p.match(api.PRINT) {
 		return p.printStatement()
 	}
@@ -72,7 +76,7 @@ func (p *Parser) expression() (expr api.IExpression, err error) {
 func (p *Parser) assignment() (expr api.IExpression, err error) {
 	// parse the left-hand side, which can be any
 	// expression of higher precedence
-	expr, err = p.equality()
+	expr, err = p.or()
 
 	if err != nil {
 		return nil, err
@@ -96,6 +100,48 @@ func (p *Parser) assignment() (expr api.IExpression, err error) {
 		// TODO create a NewParseError
 		return nil, errors.New(equals.String() + " : Invalid assignment target.")
 		// return nil, errors.NewRuntimeError(equals, "Invalid assignment target.")
+	}
+
+	return expr, nil
+}
+
+func (p *Parser) or() (expr api.IExpression, err error) {
+	expr, err = p.and()
+
+	if err != nil {
+		return nil, err
+	}
+
+	for p.match(api.OR) {
+		operator := p.previous()
+
+		right, err := p.and()
+		if err != nil {
+			return nil, err
+		}
+
+		expr = interpreter.NewLogicExpression(expr, operator, right)
+	}
+
+	return expr, nil
+}
+
+func (p *Parser) and() (expr api.IExpression, err error) {
+	expr, err = p.equality()
+
+	if err != nil {
+		return nil, err
+	}
+
+	for p.match(api.AND) {
+		operator := p.previous()
+
+		right, err := p.equality()
+		if err != nil {
+			return nil, err
+		}
+
+		expr = interpreter.NewLogicExpression(expr, operator, right)
 	}
 
 	return expr, nil
@@ -495,24 +541,36 @@ func (p *Parser) block() (statements []api.IStatement, err error) {
 }
 
 // --------------------------------------------------------
-// Expression statement
+// "if" statement
 // --------------------------------------------------------
-// func (p *Parser) varStatement() (statement api.IStatement, err error) {
-// 	expr, err := p.expression()
+func (p *Parser) ifStatement() (statement api.IStatement, err error) {
+	_, err = p.consume(api.LEFT_PAREN, "Expect '(' after 'if'.")
+	if err != nil {
+		return nil, err
+	}
 
-// 	if err != nil {
-// 		return nil, err
-// 	}
+	condition, err := p.expression()
+	if err != nil {
+		return nil, err
+	}
 
-// 	p.consume(api.SEMICOLON, "Expect ';' after expression.")
+	_, err = p.consume(api.RIGHT_PAREN, "Expect ')' after 'if' condition.")
+	if err != nil {
+		return nil, err
+	}
 
-// 	return statements.NewExpressionStatement(expr), nil
-// }
+	thenBranch, err := p.statement()
+	if err != nil {
+		return nil, err
+	}
 
-// func (p *Parser) Parse() (expr api.IExpression, err error) {
-// 	expr, err = p.expression()
-// 	if err != nil {
-// 		p.assembler.SetError(true)
-// 	}
-// 	return expr, err
-// }
+	var elseBranch api.IStatement
+	if p.match(api.ELSE) {
+		elseBranch, err = p.statement()
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return statements.NewIfStatement(condition, thenBranch, elseBranch), nil
+}

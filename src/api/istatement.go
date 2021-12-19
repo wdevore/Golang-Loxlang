@@ -9,5 +9,11 @@ type IStatement interface {
 	Name() IToken
 	Initializer() IExpression
 
+	// Blocks
 	Statements() []IStatement
+
+	// "If"
+	Condition() IExpression
+	ThenBranch() IStatement
+	ElseBranch() IStatement
 }

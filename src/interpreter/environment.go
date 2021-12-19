@@ -45,7 +45,7 @@ func (e *Environment) Get(name api.IToken) (value interface{}, err api.IRuntimeE
 		return e.enclosing.Get(name)
 	}
 
-	return nil, errors.NewRuntimeError(nil, "Undefined variable '"+name.Lexeme()+"'.")
+	return nil, errors.NewRuntimeError(name, "Undefined variable '"+name.Lexeme()+"'.")
 }
 
 func (e *Environment) Assign(name api.IToken, value interface{}) (err api.IRuntimeError) {
@@ -59,5 +59,5 @@ func (e *Environment) Assign(name api.IToken, value interface{}) (err api.IRunti
 		e.enclosing.Assign(name, value)
 	}
 
-	return errors.NewRuntimeError(nil, "Undefined variable '"+name.Lexeme()+"'.")
+	return errors.NewRuntimeError(name, "Undefined variable '"+name.Lexeme()+"'.")
 }
