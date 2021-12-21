@@ -46,6 +46,8 @@ const (
 	IF
 	ELSE
 	VAR
+	WHILE
+	FOR
 	CONST
 	IMPORT
 	CODE

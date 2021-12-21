@@ -314,7 +314,7 @@ func (s *Scanner) identifier() {
 	}
 
 	text := s.source[s.start:s.current]
-	ttype := api.Keywords[text]
+	ttype := Keywords[text]
 	if ttype == api.UNDEFINED {
 		ttype = api.IDENTIFIER
 	}

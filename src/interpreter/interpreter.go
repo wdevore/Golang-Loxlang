@@ -372,8 +372,8 @@ func (i *Interpreter) VisitVariableStatement(statement api.IStatement) (err api.
 }
 
 func (i *Interpreter) VisitBlockStatement(statement api.IStatement) (err api.IRuntimeError) {
-	parentEnv := NewEnvironmentEnclosing(i.environment)
-	return i.executeBlock(statement.Statements(), parentEnv)
+	childEnv := NewEnvironmentEnclosing(i.environment)
+	return i.executeBlock(statement.Statements(), childEnv)
 }
 
 func (i *Interpreter) VisitIfStatement(statement api.IStatement) (err api.IRuntimeError) {
@@ -383,9 +383,36 @@ func (i *Interpreter) VisitIfStatement(statement api.IStatement) (err api.IRunti
 	}
 
 	if i.isTruthy(value) {
-		i.execute(statement.ThenBranch())
+		err = i.execute(statement.ThenBranch())
+		if err != nil {
+			return err
+		}
 	} else if statement.ElseBranch() != nil {
-		i.execute(statement.ElseBranch())
+		err = i.execute(statement.ElseBranch())
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (i *Interpreter) VisitWhileStatement(statement api.IStatement) (err api.IRuntimeError) {
+	value, err := i.evaluate(statement.Condition())
+	if err != nil {
+		return err
+	}
+
+	for i.isTruthy(value) {
+		err = i.execute(statement.Body())
+		if err != nil {
+			return err
+		}
+
+		value, err = i.evaluate(statement.Condition())
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
@@ -459,25 +486,9 @@ func (i *Interpreter) extractStrings(left, right interface{}, token api.IToken) 
 	return "", "", errors.NewRuntimeError(token, "Operands not suitable.")
 }
 
-// func (i *Interpreter) isEqual(left, right interface{}) bool {
-// 	_, isNilL := left.(api.INilLiteral)
-// 	_, isNilR := right.(api.INilLiteral)
-// 	if isNilL && isNilR {
-// 		return true
-// 	}
-// 	// if objA == nil && objB == nil {
-// 	// 	return true
-// 	// }
-// 	// if objA == nil {
-// 	// 	return false
-// 	// }
-
-// 	return false
-// }
-
 // "false" and "nil" are falsey and everything else is truthy
 func (i *Interpreter) isTruthy(obj interface{}) bool {
-	if obj == nil { // TODO This should never happen
+	if obj == nil { // This should never happen
 		return false
 	}
 
@@ -494,3 +505,19 @@ func (i *Interpreter) isTruthy(obj interface{}) bool {
 		return true
 	}
 }
+
+// func (i *Interpreter) isEqual(left, right interface{}) bool {
+// 	_, isNilL := left.(api.INilLiteral)
+// 	_, isNilR := right.(api.INilLiteral)
+// 	if isNilL && isNilR {
+// 		return true
+// 	}
+// 	// if objA == nil && objB == nil {
+// 	// 	return true
+// 	// }
+// 	// if objA == nil {
+// 	// 	return false
+// 	// }
+
+// 	return false
+// }

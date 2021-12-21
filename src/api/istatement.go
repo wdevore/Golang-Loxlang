@@ -16,4 +16,7 @@ type IStatement interface {
 	Condition() IExpression
 	ThenBranch() IStatement
 	ElseBranch() IStatement
+
+	// "While"
+	Body() IStatement
 }

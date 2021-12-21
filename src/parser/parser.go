@@ -66,6 +66,10 @@ func (p *Parser) statement() (expr api.IStatement, err error) {
 		return p.printStatement()
 	}
 
+	if p.match(api.WHILE) {
+		return p.whileStatement()
+	}
+
 	return p.expressionStatement()
 }
 
@@ -473,6 +477,31 @@ func (p *Parser) synchronize() {
 	p.advance()
 }
 
+// --------------------------------------------------------
+// Blocks
+// --------------------------------------------------------
+func (p *Parser) block() (statements []api.IStatement, err error) {
+	statements = make([]api.IStatement, 0)
+
+	for !p.check(api.RIGHT_BRACE) && !p.isAtEnd() {
+		decl, err := p.declaration()
+
+		if err != nil {
+			return nil, err
+		}
+
+		statements = append(statements, decl)
+	}
+
+	_, err = p.consume(api.RIGHT_BRACE, "Expect '}' after block.")
+
+	if err != nil {
+		return nil, err
+	}
+
+	return statements, nil
+}
+
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // Statement handlers
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -516,31 +545,6 @@ func (p *Parser) expressionStatement() (statement api.IStatement, err error) {
 }
 
 // --------------------------------------------------------
-// Expression statement
-// --------------------------------------------------------
-func (p *Parser) block() (statements []api.IStatement, err error) {
-	statements = make([]api.IStatement, 0)
-
-	for !p.check(api.RIGHT_BRACE) && !p.isAtEnd() {
-		decl, err := p.declaration()
-
-		if err != nil {
-			return nil, err
-		}
-
-		statements = append(statements, decl)
-	}
-
-	_, err = p.consume(api.RIGHT_BRACE, "Expect '}' after block.")
-
-	if err != nil {
-		return nil, err
-	}
-
-	return statements, nil
-}
-
-// --------------------------------------------------------
 // "if" statement
 // --------------------------------------------------------
 func (p *Parser) ifStatement() (statement api.IStatement, err error) {
@@ -573,4 +577,31 @@ func (p *Parser) ifStatement() (statement api.IStatement, err error) {
 	}
 
 	return statements.NewIfStatement(condition, thenBranch, elseBranch), nil
+}
+
+// --------------------------------------------------------
+// "while" statement
+// --------------------------------------------------------
+func (p *Parser) whileStatement() (expr api.IStatement, err error) {
+	_, err = p.consume(api.LEFT_PAREN, "Expect '(' after 'while'.")
+	if err != nil {
+		return nil, err
+	}
+
+	condition, err := p.expression()
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = p.consume(api.RIGHT_PAREN, "Expect ')' after 'while' condition.")
+	if err != nil {
+		return nil, err
+	}
+
+	body, err := p.statement()
+	if err != nil {
+		return nil, err
+	}
+
+	return statements.NewWhileStatement(condition, body), nil
 }

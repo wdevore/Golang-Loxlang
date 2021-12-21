@@ -13,6 +13,7 @@ const (
 	VAR_EXPR
 	ASSIGN_EXPR
 	LOGIC_EXPR
+	WHILE_EXPR
 )
 
 type IExpression interface {

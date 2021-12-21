@@ -57,6 +57,7 @@ func (e *Environment) Assign(name api.IToken, value interface{}) (err api.IRunti
 
 	if e.enclosing != nil {
 		e.enclosing.Assign(name, value)
+		return nil
 	}
 
 	return errors.NewRuntimeError(name, "Undefined variable '"+name.Lexeme()+"'.")

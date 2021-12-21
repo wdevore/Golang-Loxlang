@@ -47,6 +47,10 @@ func (s *ExpressionStatement) ElseBranch() api.IStatement {
 	return nil
 }
 
+func (s *ExpressionStatement) Body() api.IStatement {
+	return nil
+}
+
 // ---------------------------------------------------
 // Block statement
 // ---------------------------------------------------
@@ -89,6 +93,10 @@ func (s *BlockStatement) ThenBranch() api.IStatement {
 }
 
 func (s *BlockStatement) ElseBranch() api.IStatement {
+	return nil
+}
+
+func (s *BlockStatement) Body() api.IStatement {
 	return nil
 }
 
@@ -137,6 +145,10 @@ func (s *PrintStatement) ElseBranch() api.IStatement {
 	return nil
 }
 
+func (s *PrintStatement) Body() api.IStatement {
+	return nil
+}
+
 // ---------------------------------------------------
 // var statement
 // ---------------------------------------------------
@@ -181,6 +193,10 @@ func (s *VarStatement) ThenBranch() api.IStatement {
 }
 
 func (s *VarStatement) ElseBranch() api.IStatement {
+	return nil
+}
+
+func (s *VarStatement) Body() api.IStatement {
 	return nil
 }
 
@@ -233,51 +249,57 @@ func (s *IfStatement) ElseBranch() api.IStatement {
 	return s.elseBranch
 }
 
+func (s *IfStatement) Body() api.IStatement {
+	return nil
+}
+
 // ---------------------------------------------------
-// Logical statement
+// "while" statement
 // ---------------------------------------------------
-// type LogicalStatement struct {
-// 	left     api.IExpression
-// 	operator api.IToken
-// 	right    api.IExpression
-// }
+type WhileStatement struct {
+	condition api.IExpression
+	body      api.IStatement
+}
 
-// func NewLogicalStatement(left api.IExpression, operator api.IToken, right api.IExpression) api.IStatement {
-// 	o := new(LogicalStatement)
-// 	o.left = left
-// 	o.operator = operator
-// 	o.right = right
-// 	return o
-// }
+func NewWhileStatement(condition api.IExpression, body api.IStatement) api.IStatement {
+	o := new(WhileStatement)
+	o.condition = condition
+	o.body = body
+	return o
+}
 
-// func (s *LogicalStatement) Accept(visitor api.IVisitorStatement) (err api.IRuntimeError) {
-// 	return visitor.VisitIfStatement(s)
-// }
+func (s *WhileStatement) Accept(visitor api.IVisitorStatement) (err api.IRuntimeError) {
+	return visitor.VisitWhileStatement(s)
+}
 
-// func (s *LogicalStatement) Expression() api.IExpression {
-// 	return nil
-// }
+func (s *WhileStatement) Expression() api.IExpression {
+	return nil
+}
 
-// func (s *LogicalStatement) Initializer() api.IExpression {
-// 	return nil
-// }
+func (s *WhileStatement) Initializer() api.IExpression {
+	return nil
+}
 
-// func (s *LogicalStatement) Name() api.IToken {
-// 	return nil
-// }
+func (s *WhileStatement) Name() api.IToken {
+	return nil
+}
 
-// func (s *LogicalStatement) Statements() []api.IStatement {
-// 	return nil
-// }
+func (s *WhileStatement) Statements() []api.IStatement {
+	return nil
+}
 
-// func (s *LogicalStatement) Left() api.IExpression {
-// 	return s.left
-// }
+func (s *WhileStatement) Condition() api.IExpression {
+	return s.condition
+}
 
-// func (s *LogicalStatement) Operator() api.IToken {
-// 	return s.operator
-// }
+func (s *WhileStatement) ThenBranch() api.IStatement {
+	return nil
+}
 
-// func (s *LogicalStatement) Right() api.IExpression {
-// 	return s.right
-// }
+func (s *WhileStatement) ElseBranch() api.IStatement {
+	return nil
+}
+
+func (s *WhileStatement) Body() api.IStatement {
+	return s.body
+}
