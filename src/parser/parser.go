@@ -70,6 +70,14 @@ func (p *Parser) statement() (expr api.IStatement, err error) {
 		return p.printStatement()
 	}
 
+	if p.match(api.BREAK) {
+		return p.breakStatement()
+	}
+
+	if p.match(api.CONTINUE) {
+		return p.continueStatement()
+	}
+
 	if p.match(api.WHILE) {
 		return p.whileStatement()
 	}

@@ -19,4 +19,7 @@ type IStatement interface {
 
 	// "While"
 	Body() IStatement
+
+	// "break", "continue" interrupts
+	Type() InterruptType
 }

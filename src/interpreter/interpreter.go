@@ -45,6 +45,9 @@ func (i *Interpreter) executeBlock(statements []api.IStatement, parentEnv api.IE
 	for _, statement := range statements {
 		err = i.execute(statement)
 		if err != nil {
+			// The error may actually be an Interrupt which means
+			// we stop processing the statements in the block
+			// and return
 			i.environment = prevEnv
 			return err
 		}

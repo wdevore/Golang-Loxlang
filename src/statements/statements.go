@@ -51,6 +51,10 @@ func (s *ExpressionStatement) Body() api.IStatement {
 	return nil
 }
 
+func (s *ExpressionStatement) Type() api.InterruptType {
+	return api.INTERRUPT_UNKNOWN
+}
+
 // ---------------------------------------------------
 // Block statement
 // ---------------------------------------------------
@@ -98,6 +102,10 @@ func (s *BlockStatement) ElseBranch() api.IStatement {
 
 func (s *BlockStatement) Body() api.IStatement {
 	return nil
+}
+
+func (s *BlockStatement) Type() api.InterruptType {
+	return api.INTERRUPT_UNKNOWN
 }
 
 // ---------------------------------------------------
@@ -149,6 +157,10 @@ func (s *PrintStatement) Body() api.IStatement {
 	return nil
 }
 
+func (s *PrintStatement) Type() api.InterruptType {
+	return api.INTERRUPT_UNKNOWN
+}
+
 // ---------------------------------------------------
 // var statement
 // ---------------------------------------------------
@@ -198,6 +210,10 @@ func (s *VarStatement) ElseBranch() api.IStatement {
 
 func (s *VarStatement) Body() api.IStatement {
 	return nil
+}
+
+func (s *VarStatement) Type() api.InterruptType {
+	return api.INTERRUPT_UNKNOWN
 }
 
 // ---------------------------------------------------
@@ -253,6 +269,10 @@ func (s *IfStatement) Body() api.IStatement {
 	return nil
 }
 
+func (s *IfStatement) Type() api.InterruptType {
+	return api.INTERRUPT_UNKNOWN
+}
+
 // ---------------------------------------------------
 // "while" statement
 // ---------------------------------------------------
@@ -302,4 +322,61 @@ func (s *WhileStatement) ElseBranch() api.IStatement {
 
 func (s *WhileStatement) Body() api.IStatement {
 	return s.body
+}
+
+func (s *WhileStatement) Type() api.InterruptType {
+	return api.INTERRUPT_UNKNOWN
+}
+
+// ---------------------------------------------------
+// "break", "continue" interrupt statements
+// ---------------------------------------------------
+type InterruptStatement struct {
+	iType api.InterruptType
+}
+
+func NewInterruptStatement(iType api.InterruptType) api.IStatement {
+	o := new(InterruptStatement)
+	o.iType = iType
+	return o
+}
+
+func (s *InterruptStatement) Accept(visitor api.IVisitorStatement) (err api.IRuntimeError) {
+	return visitor.VisitInterruptStatement(s)
+}
+
+func (s *InterruptStatement) Expression() api.IExpression {
+	return nil
+}
+
+func (s *InterruptStatement) Initializer() api.IExpression {
+	return nil
+}
+
+func (s *InterruptStatement) Name() api.IToken {
+	return nil
+}
+
+func (s *InterruptStatement) Statements() []api.IStatement {
+	return nil
+}
+
+func (s *InterruptStatement) Condition() api.IExpression {
+	return nil
+}
+
+func (s *InterruptStatement) ThenBranch() api.IStatement {
+	return nil
+}
+
+func (s *InterruptStatement) ElseBranch() api.IStatement {
+	return nil
+}
+
+func (s *InterruptStatement) Body() api.IStatement {
+	return nil
+}
+
+func (s *InterruptStatement) Type() api.InterruptType {
+	return s.iType
 }

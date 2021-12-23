@@ -7,4 +7,5 @@ type IVisitorStatement interface {
 	VisitBlockStatement(IStatement) (err IRuntimeError)
 	VisitIfStatement(IStatement) (err IRuntimeError)
 	VisitWhileStatement(IStatement) (err IRuntimeError)
+	VisitInterruptStatement(IStatement) (err IRuntimeError)
 }

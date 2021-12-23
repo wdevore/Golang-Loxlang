@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/wdevore/RISCV-Meta-Assembler/src/api"
+	"github.com/wdevore/RISCV-Meta-Assembler/src/errors"
 )
 
 // -- ~~ -- ~~ -- ~~ -- ~~ -- ~~ -- ~~ -- ~~ -- ~~ -- ~~ --
@@ -73,7 +74,18 @@ func (i *Interpreter) VisitWhileStatement(statement api.IStatement) (err api.IRu
 	for i.isTruthy(value) {
 		err = i.execute(statement.Body())
 		if err != nil {
-			return err
+			// "break", "continue" interrupt statements
+			if err.Interrupt() == api.INTERRUPT_BREAK {
+				// fmt.Println("CORE-While: breaking")
+				break
+			} else if err.Interrupt() == api.INTERRUPT_CONTINUE {
+				// fmt.Println("CORE-While: continuing")
+				// Fall through
+				// (i.e.) continue
+			} else {
+				// An actual error
+				return err
+			}
 		}
 
 		value, err = i.evaluate(statement.Condition())
@@ -83,4 +95,11 @@ func (i *Interpreter) VisitWhileStatement(statement api.IStatement) (err api.IRu
 	}
 
 	return nil
+}
+
+func (i *Interpreter) VisitInterruptStatement(statement api.IStatement) (err api.IRuntimeError) {
+	msg := fmt.Sprintf("'%s' interrupt type.", statement.Type())
+	err = errors.NewRuntimeError(nil, msg)
+	err.SetInterrupt(statement.Type())
+	return err
 }
