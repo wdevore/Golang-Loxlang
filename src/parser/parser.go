@@ -58,6 +58,10 @@ func (p *Parser) statement() (expr api.IStatement, err error) {
 		return statements.NewBlockStatement(block), nil
 	}
 
+	if p.match(api.FOR) {
+		return p.forStatement()
+	}
+
 	if p.match(api.IF) {
 		return p.ifStatement()
 	}
@@ -177,7 +181,7 @@ func (p *Parser) varDeclaration() (expr api.IStatement, err error) {
 }
 
 // --------------------------------------------------------
-// equality → comparison ( ( "!=" | "==" ) comparison )*
+// equality
 // --------------------------------------------------------
 func (p *Parser) equality() (expr api.IExpression, err error) {
 	expr, err = p.comparison()
@@ -247,7 +251,7 @@ func (p *Parser) previous() api.IToken {
 }
 
 // --------------------------------------------------------
-// comparison → term ( ( ">" | ">=" | "<" | "<=" ) term )*
+// comparison
 // --------------------------------------------------------
 func (p *Parser) comparison() (expr api.IExpression, err error) {
 	expr, err = p.term()
@@ -268,7 +272,7 @@ func (p *Parser) comparison() (expr api.IExpression, err error) {
 }
 
 // --------------------------------------------------------
-// term → factor ( ( "-" | "+" ) factor )*
+// term
 // --------------------------------------------------------
 func (p *Parser) term() (expr api.IExpression, err error) {
 	expr, err = p.factor()
@@ -289,7 +293,7 @@ func (p *Parser) term() (expr api.IExpression, err error) {
 }
 
 // --------------------------------------------------------
-// factor → unary ( ( "/" | "*" ) unary )*
+// factor
 // --------------------------------------------------------
 func (p *Parser) factor() (expr api.IExpression, err error) {
 	expr, err = p.unary()
@@ -310,7 +314,7 @@ func (p *Parser) factor() (expr api.IExpression, err error) {
 }
 
 // --------------------------------------------------------
-// unary → ( "!" | "-" ) unary | primary ;
+// unary
 // --------------------------------------------------------
 func (p *Parser) unary() (expr api.IExpression, err error) {
 
@@ -365,118 +369,6 @@ func (p *Parser) primary() (expr api.IExpression, err error) {
 	return nil, p.lerror(p.previous(), "Expected expression to begin.")
 }
 
-func (p *Parser) consume(ttype api.TokenType, message string) (token api.IToken, err error) {
-	if p.check(ttype) {
-		return p.advance(), nil
-	}
-
-	token = p.peek()
-	return token, p.lerror(token, message)
-}
-
-func (p *Parser) lerror(ttype api.IToken, message string) error {
-	p.assembler.ReportToken(ttype, message)
-	return errors.New(message)
-}
-
-// It discards tokens until it thinks it found a statement boundary.
-func (p *Parser) synchronize() {
-	p.advance()
-
-	for !p.isAtEnd() {
-		if p.previous().Type() == api.RIGHT_BRACE {
-			return
-		}
-
-		switch p.peek().Type() {
-		case api.CONST,
-			api.IMPORT,
-			api.CODE,
-			api.ALIGN_TO,
-			api.GLOBAL,
-			api.AT,
-			api.AS,
-			api.USE,
-			api.READ_ONLY,
-			api.BYTE,
-			api.HALF,
-			api.WORD,
-			api.DATA,
-			api.INT,
-			api.HI,
-			api.LO,
-			api.ADD,
-			api.SUB,
-			api.XOR,
-			api.OR,
-			api.AND,
-			api.SLL,
-			api.SRL,
-			api.SRA,
-			api.SLT,
-			api.SLTU,
-			api.ADDI,
-			api.XORI,
-			api.ORI,
-			api.ANDI,
-			api.SLLI,
-			api.SRLI,
-			api.SRAI,
-			api.SLTI,
-			api.SLTIU,
-			api.LB,
-			api.LH,
-			api.LW,
-			api.LBU,
-			api.LHU,
-			api.SB,
-			api.SH,
-			api.SW,
-			api.BEQ,
-			api.BNE,
-			api.BLT,
-			api.BGE,
-			api.BLTU,
-			api.BGEU,
-			api.JAL,
-			api.JALR,
-			api.LUI,
-			api.AUIPC,
-			api.ECALL,
-			api.EBREAK,
-			api.LA,
-			api.NOP,
-			api.LI,
-			api.MV,
-			api.NOT,
-			api.NEG,
-			api.NEGW,
-			api.SEXT,
-			api.SEQZ,
-			api.SNEZ,
-			api.SLTZ,
-			api.SGTZ,
-			api.BEQZ,
-			api.BNEZ,
-			api.BLEZ,
-			api.BGEZ,
-			api.BLTZ,
-			api.BGTZ,
-			api.BGT,
-			api.BLE,
-			api.BGTU,
-			api.BLEU,
-			api.J,
-			api.RET,
-			api.CALL,
-			api.TAIL:
-			return
-		}
-	}
-
-	p.advance()
-}
-
 // --------------------------------------------------------
 // Blocks
 // --------------------------------------------------------
@@ -502,106 +394,16 @@ func (p *Parser) block() (statements []api.IStatement, err error) {
 	return statements, nil
 }
 
-// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// Statement handlers
-// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-// --------------------------------------------------------
-// Print statement
-// --------------------------------------------------------
-func (p *Parser) printStatement() (statement api.IStatement, err error) {
-	value, err := p.expression()
-
-	if err != nil {
-		return nil, err
+func (p *Parser) consume(ttype api.TokenType, message string) (token api.IToken, err error) {
+	if p.check(ttype) {
+		return p.advance(), nil
 	}
 
-	_, err = p.consume(api.SEMICOLON, "Expect ';' after value.")
-
-	if err != nil {
-		return nil, err
-	}
-
-	return statements.NewPrintStatement(value), nil
+	token = p.peek()
+	return token, p.lerror(token, message)
 }
 
-// --------------------------------------------------------
-// Expression statement
-// --------------------------------------------------------
-func (p *Parser) expressionStatement() (statement api.IStatement, err error) {
-	expr, err := p.expression()
-
-	if err != nil {
-		return nil, err
-	}
-
-	_, err = p.consume(api.SEMICOLON, "Expect ';' after expression.")
-
-	if err != nil {
-		return nil, err
-	}
-
-	return statements.NewExpressionStatement(expr), nil
-}
-
-// --------------------------------------------------------
-// "if" statement
-// --------------------------------------------------------
-func (p *Parser) ifStatement() (statement api.IStatement, err error) {
-	_, err = p.consume(api.LEFT_PAREN, "Expect '(' after 'if'.")
-	if err != nil {
-		return nil, err
-	}
-
-	condition, err := p.expression()
-	if err != nil {
-		return nil, err
-	}
-
-	_, err = p.consume(api.RIGHT_PAREN, "Expect ')' after 'if' condition.")
-	if err != nil {
-		return nil, err
-	}
-
-	thenBranch, err := p.statement()
-	if err != nil {
-		return nil, err
-	}
-
-	var elseBranch api.IStatement
-	if p.match(api.ELSE) {
-		elseBranch, err = p.statement()
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	return statements.NewIfStatement(condition, thenBranch, elseBranch), nil
-}
-
-// --------------------------------------------------------
-// "while" statement
-// --------------------------------------------------------
-func (p *Parser) whileStatement() (expr api.IStatement, err error) {
-	_, err = p.consume(api.LEFT_PAREN, "Expect '(' after 'while'.")
-	if err != nil {
-		return nil, err
-	}
-
-	condition, err := p.expression()
-	if err != nil {
-		return nil, err
-	}
-
-	_, err = p.consume(api.RIGHT_PAREN, "Expect ')' after 'while' condition.")
-	if err != nil {
-		return nil, err
-	}
-
-	body, err := p.statement()
-	if err != nil {
-		return nil, err
-	}
-
-	return statements.NewWhileStatement(condition, body), nil
+func (p *Parser) lerror(ttype api.IToken, message string) error {
+	p.assembler.ReportToken(ttype, message)
+	return errors.New(message)
 }
