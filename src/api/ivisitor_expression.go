@@ -8,4 +8,5 @@ type IVisitorExpression interface {
 	VisitVariableExpression(IExpression) (obj interface{}, err IRuntimeError)
 	VisitAssignExpression(IExpression) (obj interface{}, err IRuntimeError)
 	VisitLogicalExpression(IExpression) (obj interface{}, err IRuntimeError)
+	VisitCallExpression(IExpression) (obj interface{}, err IRuntimeError)
 }

@@ -14,6 +14,8 @@ const (
 	ASSIGN_EXPR
 	LOGIC_EXPR
 	WHILE_EXPR
+	CALL_EXPR
+	FUN_EXPR
 )
 
 type IExpression interface {
@@ -35,4 +37,9 @@ type IExpression interface {
 
 	// What type of expression
 	Type() ExpressionType
+
+	// Call
+	Callee() IExpression
+	Paren() IToken
+	Arguments() []IExpression
 }

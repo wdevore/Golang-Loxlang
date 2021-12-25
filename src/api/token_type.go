@@ -50,6 +50,7 @@ const (
 	FOR
 	BREAK
 	CONTINUE
+	FUN
 	CONST
 	IMPORT
 	CODE

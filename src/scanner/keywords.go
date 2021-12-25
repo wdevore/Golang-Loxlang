@@ -18,6 +18,7 @@ var Keywords = map[string]api.TokenType{
 	"for":      api.FOR,
 	"break":    api.BREAK,
 	"continue": api.CONTINUE,
+	"fun":      api.FUN,
 	"code":     api.CODE,
 	"alignTo":  api.ALIGN_TO,
 	"global":   api.GLOBAL,

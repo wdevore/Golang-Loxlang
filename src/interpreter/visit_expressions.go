@@ -1,6 +1,8 @@
 package interpreter
 
 import (
+	"fmt"
+
 	"github.com/wdevore/RISCV-Meta-Assembler/src/api"
 	"github.com/wdevore/RISCV-Meta-Assembler/src/errors"
 	"github.com/wdevore/RISCV-Meta-Assembler/src/scanner/literals"
@@ -285,4 +287,37 @@ func (i *Interpreter) VisitAssignExpression(exprV api.IExpression) (obj interfac
 	}
 
 	return nil, errors.NewRuntimeError(exprV.Name(), "Expression is not an Assignment.")
+}
+
+func (i *Interpreter) VisitCallExpression(exprV api.IExpression) (obj interface{}, err api.IRuntimeError) {
+	// The expression is just an identifier that looks up the
+	// function by its name, but it could be anything.
+	callee, err := i.evaluate(exprV.Callee())
+	if err != nil {
+		return nil, err
+	}
+
+	arguments := make([]interface{}, 0) // = []interface{}{}
+
+	for _, argument := range exprV.Arguments() {
+		value, err := i.evaluate(argument)
+		if err != nil {
+			return nil, err
+		}
+		arguments = append(arguments, value)
+	}
+
+	function, ok := callee.(api.ICallable)
+	if !ok {
+		return nil, errors.NewRuntimeError(exprV.Name(), "Can only call functions and classes.")
+	}
+
+	if len(arguments) != function.Arity() {
+		msg := fmt.Sprintf("Expected %d arguments but got %d.", function.Arity(), len(arguments))
+		return nil, errors.NewRuntimeError(exprV.Paren(), msg)
+	}
+
+	// The implementer’s job is
+	// to return the value that the call expression produces.
+	return function.Call(i, arguments)
 }

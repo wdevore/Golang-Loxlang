@@ -17,9 +17,12 @@ type IStatement interface {
 	ThenBranch() IStatement
 	ElseBranch() IStatement
 
-	// "While"
-	Body() IStatement
+	// "While", Functions
+	Body() []IStatement
 
 	// "break", "continue" interrupts
 	Type() InterruptType
+
+	// Functions
+	Parameters() []IToken
 }

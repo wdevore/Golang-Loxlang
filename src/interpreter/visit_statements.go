@@ -41,7 +41,7 @@ func (i *Interpreter) VisitVariableStatement(statement api.IStatement) (err api.
 
 func (i *Interpreter) VisitBlockStatement(statement api.IStatement) (err api.IRuntimeError) {
 	childEnv := NewEnvironmentEnclosing(i.environment)
-	return i.executeBlock(statement.Statements(), childEnv)
+	return i.ExecuteBlock(statement.Statements(), childEnv)
 }
 
 func (i *Interpreter) VisitIfStatement(statement api.IStatement) (err api.IRuntimeError) {
@@ -72,7 +72,7 @@ func (i *Interpreter) VisitWhileStatement(statement api.IStatement) (err api.IRu
 	}
 
 	for i.isTruthy(value) {
-		err = i.execute(statement.Body())
+		err = i.execute(statement.Body()[0])
 		if err != nil {
 			// "break", "continue" interrupt statements
 			if err.Interrupt() == api.INTERRUPT_BREAK {
@@ -102,4 +102,13 @@ func (i *Interpreter) VisitInterruptStatement(statement api.IStatement) (err api
 	err = errors.NewRuntimeError(nil, msg)
 	err.SetInterrupt(statement.Type())
 	return err
+}
+
+func (i *Interpreter) VisitFunctionStatement(statement api.IStatement) (err api.IRuntimeError) {
+	// This is similar to how we interpret other literal expressions. We take a function
+	// syntax node—a compile time representation of the function—and convert it to
+	// its runtime representation. Here, that’s a LoxFunction that wraps the syntax
+	// node.
+	function := NewFunctionCallable(statement)
+	return i.environment.Define(statement.Name().Lexeme(), function)
 }

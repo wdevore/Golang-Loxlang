@@ -37,6 +37,10 @@ func (p *Parser) Parse() (statements []api.IStatement, err error) {
 }
 
 func (p *Parser) declaration() (expr api.IStatement, err error) {
+	if p.match(api.FUN) {
+		return p.function("function")
+	}
+
 	if p.match(api.VAR) {
 		statement, err := p.varDeclaration()
 		if err != nil {
@@ -83,6 +87,55 @@ func (p *Parser) statement() (expr api.IStatement, err error) {
 	}
 
 	return p.expressionStatement()
+}
+
+func (p *Parser) function(kind string) (expr api.IStatement, err error) {
+	funName, err := p.consume(api.IDENTIFIER, "Expect '"+kind+"' name.")
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = p.consume(api.LEFT_PAREN, "Expect '(' after '"+kind+"' name.")
+	if err != nil {
+		return nil, err
+	}
+
+	parameters := []api.IToken{}
+
+	if !p.check(api.RIGHT_PAREN) {
+		for matchComma := true; matchComma; matchComma = p.match(api.COMMA) {
+			if len(parameters) >= 255 {
+				return nil, errors.New("'" + p.peek().Lexeme() + "' can't more than 255 parameters.")
+			}
+
+			parmName, err := p.consume(api.IDENTIFIER, "Expect parameter name.")
+			if err != nil {
+				return nil, err
+			}
+
+			parameters = append(parameters, parmName)
+		}
+
+		_, err = p.consume(api.RIGHT_PAREN, "Expect ')' after parameters.")
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	// We consume the { at the beginning of the body here before calling
+	// block(). Because block() assumes the brace token has already been
+	// matched.
+	_, err = p.consume(api.LEFT_BRACE, "Expect '{' before '"+kind+"' body.")
+	if err != nil {
+		return nil, err
+	}
+
+	body, err := p.block()
+	if err != nil {
+		return nil, err
+	}
+
+	return statements.NewFunctionStatement(funName, parameters, body), nil
 }
 
 func (p *Parser) expression() (expr api.IExpression, err error) {
@@ -269,9 +322,9 @@ func (p *Parser) comparison() (expr api.IExpression, err error) {
 
 	for p.match(api.GREATER, api.GREATER_EQUAL, api.LESS, api.LESS_EQUAL) {
 		operator := p.previous()
-		right, errc := p.term()
-		if errc != nil {
-			return nil, errc
+		right, err := p.term()
+		if err != nil {
+			return nil, err
 		}
 		expr = interpreter.NewBinaryExpression(expr, operator, right)
 	}
@@ -290,9 +343,9 @@ func (p *Parser) term() (expr api.IExpression, err error) {
 
 	for p.match(api.MINUS, api.PLUS) {
 		operator := p.previous()
-		right, errc := p.factor()
-		if errc != nil {
-			return nil, errc
+		right, err := p.factor()
+		if err != nil {
+			return nil, err
 		}
 		expr = interpreter.NewBinaryExpression(expr, operator, right)
 	}
@@ -311,10 +364,11 @@ func (p *Parser) factor() (expr api.IExpression, err error) {
 
 	for p.match(api.SLASH, api.STAR) {
 		operator := p.previous()
-		right, errc := p.unary()
-		if errc != nil {
-			return nil, errc
+		right, err := p.unary()
+		if err != nil {
+			return nil, err
 		}
+
 		expr = interpreter.NewBinaryExpression(expr, operator, right)
 	}
 
@@ -328,14 +382,65 @@ func (p *Parser) unary() (expr api.IExpression, err error) {
 
 	if p.match(api.BANG, api.MINUS) {
 		operator := p.previous()
-		right, errc := p.unary()
-		if errc != nil {
-			return nil, errc
+		right, err := p.unary()
+		if err != nil {
+			return nil, err
 		}
 		return interpreter.NewUnaryExpression(operator, right), nil
 	}
 
-	return p.primary()
+	return p.call()
+}
+
+func (p *Parser) call() (expr api.IExpression, err error) {
+	// First, we parse a primary expression, the “left operand” to the call.
+	expr, err = p.primary()
+	if err != nil {
+		return nil, err
+	}
+
+	for {
+		// Each time we see a "("" , we call finishCall() to parse the call expression using the
+		// previously parsed expression as the callee
+		if p.match(api.LEFT_PAREN) {
+			// The returned expression becomes the
+			// new expr and we loop to see if the result is itself called.
+			expr, err = p.finishCall(expr)
+			if err != nil {
+				return nil, err
+			}
+		} else {
+			break
+		}
+	}
+
+	return expr, nil
+}
+func (p *Parser) finishCall(callee api.IExpression) (expr api.IExpression, err error) {
+	arguments := []api.IExpression{}
+
+	// handle the zero-argument case. We check for that case first by
+	// seeing if the next token is ")"
+	if !p.check(api.RIGHT_PAREN) {
+		for matchComma := true; matchComma; matchComma = p.match(api.COMMA) {
+			expr, err = p.expression()
+			if err != nil {
+				return nil, err
+			}
+
+			if len(arguments) >= 255 {
+				return nil, errors.New("'" + p.peek().Lexeme() + "' can't more than 255 arguments.")
+			}
+			arguments = append(arguments, expr)
+		}
+	}
+
+	paren, err := p.consume(api.RIGHT_PAREN, "Expect ')' after arguments.")
+	if err != nil {
+		return nil, err
+	}
+
+	return interpreter.NewCallExpression(callee, paren, arguments), nil
 }
 
 func (p *Parser) primary() (expr api.IExpression, err error) {
@@ -365,7 +470,7 @@ func (p *Parser) primary() (expr api.IExpression, err error) {
 		if errc != nil {
 			return nil, errc
 		}
-		_, err = p.consume(api.RIGHT_PAREN, "Expect ')' after expression")
+		_, err = p.consume(api.RIGHT_PAREN, "Expect ')' after expression.")
 		if err != nil {
 			return nil, err
 		}

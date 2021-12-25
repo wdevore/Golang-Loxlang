@@ -6,13 +6,29 @@ import (
 )
 
 type Interpreter struct {
+	// This globals field holds a fixed
+	// reference to the outermost global environment.
+	globals     api.IEnvironment
 	environment api.IEnvironment
 }
 
 func NewInterpreter() api.IInterpreter {
 	o := new(Interpreter)
-	o.environment = NewEnvironment()
+	o.configure()
 	return o
+}
+
+func (i *Interpreter) configure() (err api.IRuntimeError) {
+	i.globals = NewEnvironment()
+	i.environment = i.globals
+
+	i.globals.Define("clock", NewClockCallable())
+
+	return nil
+}
+
+func (i *Interpreter) Globals() api.IEnvironment {
+	return i.globals
 }
 
 // IInterpreter interface method
@@ -37,7 +53,7 @@ func (i *Interpreter) evaluate(expr api.IExpression) (obj interface{}, err api.I
 	return expr.Accept(i)
 }
 
-func (i *Interpreter) executeBlock(statements []api.IStatement, parentEnv api.IEnvironment) (err api.IRuntimeError) {
+func (i *Interpreter) ExecuteBlock(statements []api.IStatement, parentEnv api.IEnvironment) (err api.IRuntimeError) {
 	prevEnv := i.environment
 
 	i.environment = parentEnv

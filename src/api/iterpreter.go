@@ -1,6 +1,7 @@
 package api
 
 type IInterpreter interface {
-	// Interpret(exprV IExpression) IRuntimeError
 	Interpret(statements []IStatement) IRuntimeError
+	Globals() IEnvironment
+	ExecuteBlock(statements []IStatement, parentEnv IEnvironment) (err IRuntimeError)
 }
