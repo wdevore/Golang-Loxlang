@@ -7,9 +7,12 @@ import (
 )
 
 type RuntimeError struct {
-	token         api.IToken
-	message       string
 	interruptType api.InterruptType
+
+	token   api.IToken
+	message string
+
+	value interface{}
 }
 
 func NewRuntimeError(token api.IToken, message string) api.IRuntimeError {
@@ -45,4 +48,12 @@ func (r *RuntimeError) ClearInterrupt() {
 
 func (r *RuntimeError) SetInterrupt(iType api.InterruptType) {
 	r.interruptType = iType
+}
+
+func (r *RuntimeError) Value() interface{} {
+	return r.value
+}
+
+func (r *RuntimeError) SetValue(value interface{}) {
+	r.value = value
 }

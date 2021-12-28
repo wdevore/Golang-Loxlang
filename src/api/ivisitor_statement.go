@@ -9,4 +9,5 @@ type IVisitorStatement interface {
 	VisitWhileStatement(IStatement) (err IRuntimeError)
 	VisitInterruptStatement(IStatement) (err IRuntimeError)
 	VisitFunctionStatement(IStatement) (err IRuntimeError)
+	VisitReturnStatement(IStatement) (err IRuntimeError)
 }

@@ -76,10 +76,10 @@ func (i *Interpreter) VisitWhileStatement(statement api.IStatement) (err api.IRu
 		if err != nil {
 			// "break", "continue" interrupt statements
 			if err.Interrupt() == api.INTERRUPT_BREAK {
-				// fmt.Println("CORE-While: breaking")
+				// fmt.Println("VisitWhileStatement: breaking")
 				break
 			} else if err.Interrupt() == api.INTERRUPT_CONTINUE {
-				// fmt.Println("CORE-While: continuing")
+				// fmt.Println("VisitWhileStatement: continuing")
 				// Fall through
 				// (i.e.) continue
 			} else {
@@ -100,7 +100,9 @@ func (i *Interpreter) VisitWhileStatement(statement api.IStatement) (err api.IRu
 func (i *Interpreter) VisitInterruptStatement(statement api.IStatement) (err api.IRuntimeError) {
 	msg := fmt.Sprintf("'%s' interrupt type.", statement.Type())
 	err = errors.NewRuntimeError(nil, msg)
+
 	err.SetInterrupt(statement.Type())
+
 	return err
 }
 
@@ -111,4 +113,23 @@ func (i *Interpreter) VisitFunctionStatement(statement api.IStatement) (err api.
 	// node.
 	function := NewFunctionCallable(statement)
 	return i.environment.Define(statement.Name().Lexeme(), function)
+}
+
+func (i *Interpreter) VisitReturnStatement(statement api.IStatement) (err api.IRuntimeError) {
+	var value interface{}
+
+	if statement.Value() != nil {
+		value, err = i.evaluate(statement.Value())
+		if err != nil {
+			return err
+		}
+	}
+
+	msg := fmt.Sprintf("'%s' interrupt type.", statement.Type())
+	err = errors.NewRuntimeError(nil, msg)
+
+	err.SetValue(value)
+	err.SetInterrupt(statement.Type())
+
+	return err
 }

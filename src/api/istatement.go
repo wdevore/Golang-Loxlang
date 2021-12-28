@@ -25,4 +25,8 @@ type IStatement interface {
 
 	// Functions
 	Parameters() []IToken
+
+	// "return"
+	Keyword() IToken
+	Value() IExpression
 }

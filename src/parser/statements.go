@@ -27,6 +27,34 @@ func (p *Parser) printStatement() (statement api.IStatement, err error) {
 }
 
 // --------------------------------------------------------
+// Return statement
+// --------------------------------------------------------
+func (p *Parser) returnStatement() (statement api.IStatement, err error) {
+	keyword := p.previous()
+
+	var value api.IExpression
+
+	// Since many different tokens can potentially start an expression, it’s
+	// hard to tell if a return value is present. Instead, we check if it’s absent.
+	// Since a semicolon can’t begin an expression, if the next token is that, we know there
+	// must not be a value.
+	if !p.check(api.SEMICOLON) {
+		value, err = p.expression()
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	_, err = p.consume(api.SEMICOLON, "Expect ';' after return value.")
+
+	if err != nil {
+		return nil, err
+	}
+
+	return statements.NewReturnStatement(keyword, value), nil
+}
+
+// --------------------------------------------------------
 // Expression statement
 // --------------------------------------------------------
 func (p *Parser) expressionStatement() (statement api.IStatement, err error) {

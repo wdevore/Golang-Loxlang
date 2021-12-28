@@ -74,6 +74,10 @@ func (p *Parser) statement() (expr api.IStatement, err error) {
 		return p.printStatement()
 	}
 
+	if p.match(api.RETURN) {
+		return p.returnStatement()
+	}
+
 	if p.match(api.BREAK) {
 		return p.breakStatement()
 	}

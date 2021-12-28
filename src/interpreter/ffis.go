@@ -57,6 +57,15 @@ func (c *FunctionCallable) Call(interpreter api.IInterpreter, arguments []interf
 
 	err = interpreter.ExecuteBlock(c.declaration.Body(), environment)
 	if err != nil {
+		// The error may actually be a "return" control-flow Interrupt which means
+		// we just return the "return"'s value instead of interpreting
+		// the err as an actual error.
+		// Note: the VisitWhileStatement does something similar.
+		if err.Interrupt() == api.INTERRUPT_RETURN {
+			// fmt.Println("FFI: explicit return")
+			return err.Value(), nil
+		}
+
 		return nil, err
 	}
 

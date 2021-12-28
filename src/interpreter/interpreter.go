@@ -61,7 +61,7 @@ func (i *Interpreter) ExecuteBlock(statements []api.IStatement, parentEnv api.IE
 	for _, statement := range statements {
 		err = i.execute(statement)
 		if err != nil {
-			// The error may actually be an Interrupt which means
+			// The error may actually be a control-flow Interrupt which means
 			// we stop processing the statements in the block
 			// and return
 			i.environment = prevEnv

@@ -9,6 +9,7 @@ const (
 
 	INTERRUPT_BREAK
 	INTERRUPT_CONTINUE
+	INTERRUPT_RETURN
 )
 
 type IRuntimeError interface {
@@ -20,6 +21,10 @@ type IRuntimeError interface {
 	Interrupt() InterruptType
 	SetInterrupt(InterruptType)
 	ClearInterrupt()
+
+	// "return"
+	Value() interface{} // Object
+	SetValue(obj interface{})
 }
 
 func (t InterruptType) String() string {
@@ -28,6 +33,8 @@ func (t InterruptType) String() string {
 		return "break"
 	case INTERRUPT_CONTINUE:
 		return "continue"
+	case INTERRUPT_RETURN:
+		return "return"
 	default:
 		return "unknown interrupt"
 	}

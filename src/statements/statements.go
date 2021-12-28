@@ -45,6 +45,14 @@ func (s *Statement) Parameters() []api.IToken {
 	return nil
 }
 
+func (s *Statement) Keyword() api.IToken {
+	return nil
+}
+
+func (s *Statement) Value() api.IExpression {
+	return nil
+}
+
 // ---------------------------------------------------
 // Expression statement
 // ---------------------------------------------------
@@ -262,4 +270,39 @@ func (s *FunctionStatement) Parameters() []api.IToken {
 }
 func (s *FunctionStatement) Body() []api.IStatement {
 	return s.body
+}
+
+// ---------------------------------------------------
+// "return" statement
+// ---------------------------------------------------
+type ReturnStatement struct {
+	Statement
+
+	keyword api.IToken
+	value   api.IExpression
+
+	iType api.InterruptType
+}
+
+func NewReturnStatement(keyword api.IToken, value api.IExpression) api.IStatement {
+	o := new(ReturnStatement)
+	o.keyword = keyword
+	o.value = value
+	o.iType = api.INTERRUPT_RETURN
+	return o
+}
+
+func (s *ReturnStatement) Accept(visitor api.IVisitorStatement) (err api.IRuntimeError) {
+	return visitor.VisitReturnStatement(s)
+}
+
+func (s *ReturnStatement) Keyword() api.IToken {
+	return s.keyword
+}
+func (s *ReturnStatement) Value() api.IExpression {
+	return s.value
+}
+
+func (s *ReturnStatement) Type() api.InterruptType {
+	return s.iType
 }
