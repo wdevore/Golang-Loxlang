@@ -36,11 +36,13 @@ func (c ClockCallable) String() string {
 // ~~~---~~~---~~~---~~~---~~~---~~~---~~~---~~~---~~~---~~~---
 type FunctionCallable struct {
 	declaration api.IStatement
+	closure     api.IEnvironment
 }
 
-func NewFunctionCallable(declaration api.IStatement) api.ICallable {
+func NewFunctionCallable(declaration api.IStatement, closure api.IEnvironment) api.ICallable {
 	o := new(FunctionCallable)
 	o.declaration = declaration
+	o.closure = closure
 	return o
 }
 
@@ -49,7 +51,7 @@ func (c *FunctionCallable) Arity() int {
 }
 
 func (c *FunctionCallable) Call(interpreter api.IInterpreter, arguments []interface{}) (obj interface{}, err api.IRuntimeError) {
-	environment := NewEnvironmentEnclosing(interpreter.Globals())
+	environment := NewEnvironmentEnclosing(c.closure)
 
 	for i, parm := range c.declaration.Parameters() {
 		environment.Define(parm.Lexeme(), arguments[i])

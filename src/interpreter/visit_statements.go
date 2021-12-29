@@ -108,10 +108,14 @@ func (i *Interpreter) VisitInterruptStatement(statement api.IStatement) (err api
 
 func (i *Interpreter) VisitFunctionStatement(statement api.IStatement) (err api.IRuntimeError) {
 	// This is similar to how we interpret other literal expressions. We take a function
-	// syntax node—a compile time representation of the function—and convert it to
+	// syntax node--a compile time representation of the function—-and convert it to
 	// its runtime representation. Here, that’s a LoxFunction that wraps the syntax
 	// node.
-	function := NewFunctionCallable(statement)
+
+	// The environment that is active when the function is declared not when it’s called
+	// It represents the lexical scope surrounding the
+	// function declaration.
+	function := NewFunctionCallable(statement, i.environment)
 	return i.environment.Define(statement.Name().Lexeme(), function)
 }
 

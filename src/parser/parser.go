@@ -119,11 +119,11 @@ func (p *Parser) function(kind string) (expr api.IStatement, err error) {
 
 			parameters = append(parameters, parmName)
 		}
+	}
 
-		_, err = p.consume(api.RIGHT_PAREN, "Expect ')' after parameters.")
-		if err != nil {
-			return nil, err
-		}
+	_, err = p.consume(api.RIGHT_PAREN, "Expect ')' after parameters.")
+	if err != nil {
+		return nil, err
 	}
 
 	// We consume the { at the beginning of the body here before calling
