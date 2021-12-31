@@ -13,6 +13,19 @@ func (r *Resolver) VisitExpressionStatement(statement api.IStatement) (err api.I
 	return nil
 }
 
+func (r *Resolver) VisitBlockStatement(statement api.IStatement) (err api.IRuntimeError) {
+	r.beginScope()
+
+	err = r.resolveStatements(statement.Statements())
+	if err != nil {
+		return err
+	}
+
+	r.endScope()
+
+	return nil
+}
+
 func (r *Resolver) VisitFunctionStatement(statement api.IStatement) (err api.IRuntimeError) {
 	err = r.declare(statement.Name())
 	if err != nil {

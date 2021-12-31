@@ -16,7 +16,6 @@ const (
 	// defined here will be the default
 	FTYPE_NONE FunctionType = iota
 	FTYPE_FUNCTION
-	FTYPE_BREAK
 )
 
 type Resolver struct {
@@ -46,19 +45,6 @@ func NewResolver(interpreter api.IInterpreter) api.IResolver {
 
 func (r *Resolver) Resolve(statements []api.IStatement) (err api.IRuntimeError) {
 	return r.resolveStatements(statements)
-}
-
-func (r *Resolver) VisitBlockStatement(statement api.IStatement) (err api.IRuntimeError) {
-	r.beginScope()
-
-	err = r.resolveStatements(statement.Statements())
-	if err != nil {
-		return err
-	}
-
-	r.endScope()
-
-	return nil
 }
 
 // These resolve methods are similar to the evaluate() and execute() methods in
