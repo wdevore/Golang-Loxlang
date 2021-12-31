@@ -4,6 +4,6 @@
         "Generate": "Ascii"
     },
     "Source": [
-        "simple_closure.lox"
+        "simple_return.lox"
     ]
 }

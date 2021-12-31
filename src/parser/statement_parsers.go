@@ -112,26 +112,26 @@ func (p *Parser) ifStatement() (statement api.IStatement, err error) {
 // "break" statement
 // --------------------------------------------------------
 func (p *Parser) breakStatement() (expr api.IStatement, err error) {
-	_, err = p.consume(api.SEMICOLON, "Expect ';' after 'break'.")
+	value, err := p.consume(api.SEMICOLON, "Expect ';' after 'break'.")
 
 	if err != nil {
 		return nil, err
 	}
 
-	return statements.NewInterruptStatement(api.INTERRUPT_BREAK), nil
+	return statements.NewInterruptStatement(value, api.INTERRUPT_BREAK), nil
 }
 
 // --------------------------------------------------------
 // "continue" statement
 // --------------------------------------------------------
 func (p *Parser) continueStatement() (expr api.IStatement, err error) {
-	_, err = p.consume(api.SEMICOLON, "Expect ';' after 'continue'.")
+	value, err := p.consume(api.SEMICOLON, "Expect ';' after 'continue'.")
 
 	if err != nil {
 		return nil, err
 	}
 
-	return statements.NewInterruptStatement(api.INTERRUPT_CONTINUE), nil
+	return statements.NewInterruptStatement(value, api.INTERRUPT_CONTINUE), nil
 }
 
 // --------------------------------------------------------

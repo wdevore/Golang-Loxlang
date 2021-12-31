@@ -8,7 +8,9 @@ import (
 type Interpreter struct {
 	// This globals field holds a fixed
 	// reference to the outermost global environment.
-	globals     api.IEnvironment
+	globals api.IEnvironment
+	// A map that associates each syntax tree node with its resolved data.
+	locals      map[api.IExpression]int
 	environment api.IEnvironment
 }
 
@@ -23,6 +25,8 @@ func (i *Interpreter) configure() (err api.IRuntimeError) {
 	i.environment = i.globals
 
 	i.globals.Define("clock", NewClockCallable())
+
+	i.locals = map[api.IExpression]int{}
 
 	return nil
 }
@@ -72,6 +76,21 @@ func (i *Interpreter) ExecuteBlock(statements []api.IStatement, parentEnv api.IE
 	i.environment = prevEnv
 
 	return nil
+}
+
+func (i *Interpreter) Resolve(expr api.IExpression, depth int) (err api.IRuntimeError) {
+	i.locals[expr] = depth
+	return nil
+}
+
+func (i *Interpreter) lookUpVariable(expr api.IExpression) (obj interface{}, err api.IRuntimeError) {
+	name := expr.Name()
+
+	if distance, ok := i.locals[expr]; ok {
+		return i.environment.GetAt(distance, name)
+	}
+
+	return i.globals.Get(name)
 }
 
 // ------------------------------------------------------------

@@ -221,12 +221,14 @@ func (s *WhileStatement) Body() []api.IStatement {
 type InterruptStatement struct {
 	Statement
 
+	name  api.IToken
 	iType api.InterruptType
 }
 
-func NewInterruptStatement(iType api.InterruptType) api.IStatement {
+func NewInterruptStatement(name api.IToken, iType api.InterruptType) api.IStatement {
 	o := new(InterruptStatement)
 	o.iType = iType
+	o.name = name
 	return o
 }
 
@@ -236,6 +238,10 @@ func (s *InterruptStatement) Accept(visitor api.IVisitorStatement) (err api.IRun
 
 func (s *InterruptStatement) Type() api.InterruptType {
 	return s.iType
+}
+
+func (s *InterruptStatement) Name() api.IToken {
+	return s.name
 }
 
 // ---------------------------------------------------

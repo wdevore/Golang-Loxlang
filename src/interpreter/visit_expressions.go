@@ -268,25 +268,33 @@ func (i *Interpreter) VisitBinaryExpression(exprV api.IExpression) (obj interfac
 }
 
 func (i *Interpreter) VisitVariableExpression(exprV api.IExpression) (obj interface{}, err api.IRuntimeError) {
-	return i.environment.Get(exprV.Name())
+	obj, err = i.lookUpVariable(exprV)
+	if err != nil {
+		return nil, err
+	}
+	return obj, nil
 }
 
 func (i *Interpreter) VisitAssignExpression(exprV api.IExpression) (obj interface{}, err api.IRuntimeError) {
-	if exprV.Type() == api.ASSIGN_EXPR {
-		value, err := i.evaluate(exprV.Expression()) // i.e. exprV.Value()
-		if err != nil {
-			return nil, err
-		}
-
-		err = i.environment.Assign(exprV.Name(), value)
-		if err != nil {
-			return nil, err
-		}
-
-		return value, nil
+	value, err := i.evaluate(exprV.Expression()) // i.e. exprV.Value()
+	if err != nil {
+		return nil, err
 	}
 
-	return nil, errors.NewRuntimeError(exprV.Name(), "Expression is not an Assignment.")
+	if distance, ok := i.locals[exprV]; ok {
+		err = i.environment.AssignAt(distance, exprV.Name(), value)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		err = i.globals.Assign(exprV.Name(), value)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return value, nil
+
 }
 
 func (i *Interpreter) VisitCallExpression(exprV api.IExpression) (obj interface{}, err api.IRuntimeError) {

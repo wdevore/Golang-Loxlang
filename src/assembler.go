@@ -12,6 +12,7 @@ import (
 	"github.com/wdevore/RISCV-Meta-Assembler/src/errors"
 	"github.com/wdevore/RISCV-Meta-Assembler/src/interpreter"
 	"github.com/wdevore/RISCV-Meta-Assembler/src/parser"
+	"github.com/wdevore/RISCV-Meta-Assembler/src/resolver"
 	"github.com/wdevore/RISCV-Meta-Assembler/src/scanner"
 )
 
@@ -96,6 +97,13 @@ func (a *Assembler) Run(source string) error {
 	a.statements, err = parser.Parse()
 	if err != nil {
 		return fmt.Errorf("unexpected error occurred during parser: %v", err)
+	}
+
+	resolver := resolver.NewResolver(a.interpreter)
+
+	errR := resolver.Resolve(a.statements)
+	if errR != nil {
+		return fmt.Errorf("unexpected error occurred during interpreting: %v", errR)
 	}
 
 	rerr := a.interpreter.Interpret(a.statements)

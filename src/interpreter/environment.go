@@ -14,6 +14,7 @@ type Environment struct {
 func NewEnvironment() api.IEnvironment {
 	o := new(Environment)
 	o.values = make(map[string]interface{})
+	o.enclosing = nil
 	return o
 }
 
@@ -35,6 +36,14 @@ func (e *Environment) Define(name string, obj interface{}) (err api.IRuntimeErro
 	return errors.NewRuntimeError(nil, "Variable '"+name+"' already defined.")
 }
 
+func (e *Environment) Enclosing() api.IEnvironment {
+	return e.enclosing
+}
+
+func (e *Environment) Values() map[string]interface{} {
+	return e.values
+}
+
 func (e *Environment) Get(name api.IToken) (value interface{}, err api.IRuntimeError) {
 	value, ok := e.values[name.Lexeme()]
 	if ok {
@@ -46,6 +55,27 @@ func (e *Environment) Get(name api.IToken) (value interface{}, err api.IRuntimeE
 	}
 
 	return nil, errors.NewRuntimeError(name, "Undefined variable '"+name.Lexeme()+"'.")
+}
+
+func (e *Environment) GetAt(distance int, name api.IToken) (obj interface{}, err api.IRuntimeError) {
+	ancestor := e.ancestor(distance)
+	if value, ok := ancestor.Values()[name.Lexeme()]; ok {
+		return value, nil
+	}
+
+	// Should never actually reach this unless there is a coding
+	// error or resolver error.
+	return nil, errors.NewRuntimeError(name, "Undefined variable '"+name.Lexeme()+"'.")
+}
+
+func (e *Environment) ancestor(distance int) api.IEnvironment {
+	environment := e
+
+	for i := 0; i < distance; i++ {
+		environment = environment.enclosing.(*Environment)
+	}
+
+	return environment
 }
 
 func (e *Environment) Assign(name api.IToken, value interface{}) (err api.IRuntimeError) {
@@ -61,4 +91,9 @@ func (e *Environment) Assign(name api.IToken, value interface{}) (err api.IRunti
 	}
 
 	return errors.NewRuntimeError(name, "Undefined variable '"+name.Lexeme()+"'.")
+}
+
+func (e *Environment) AssignAt(distance int, name api.IToken, value interface{}) (err api.IRuntimeError) {
+	e.ancestor(distance).Values()[name.Lexeme()] = value
+	return nil
 }
