@@ -1,6 +1,7 @@
 # Lox language
 ## TODOs
--- Add "break;" keyword
+  - (Partially complete) unreachable code. if a "return" has been found in a local scope and we encounter other code directly following then we error
+  - values never read/used
 
 # RISCV-Meta-Assembler
 RISC-V meta assembler that adds quality of life features

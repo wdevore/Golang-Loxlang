@@ -1,13 +1,12 @@
 package resolver
 
 import (
+	"fmt"
+	"log"
+
 	"github.com/wdevore/RISCV-Meta-Assembler/src/api"
 	"github.com/wdevore/RISCV-Meta-Assembler/src/errors"
 )
-
-// TODO Add checks for break outside loops,
-// unreachable code,
-// values never read
 
 type FunctionType int64
 
@@ -50,7 +49,18 @@ func (r *Resolver) Resolve(statements []api.IStatement) (err api.IRuntimeError) 
 // These resolve methods are similar to the evaluate() and execute() methods in
 // Interpreter
 func (r *Resolver) resolveStatements(statements []api.IStatement) (err api.IRuntimeError) {
+	// Scan statements for a "return" statement. If found then check for any following statements.
+	// If has more statements then those are unreachable.
+	returnStmtFound := false
+
 	for _, statement := range statements {
+		// fmt.Println(statement)
+		if statement.StmtType() == api.STMT_RETURN && !returnStmtFound {
+			returnStmtFound = true
+		} else if returnStmtFound {
+			log.Println(fmt.Sprintf("WARNING, unreachable code: %s", statement))
+		}
+
 		err = r.resolveStatement(statement)
 		if err != nil {
 			return err

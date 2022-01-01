@@ -43,3 +43,32 @@ type IExpression interface {
 	Paren() IToken
 	Arguments() []IExpression
 }
+
+func (e ExpressionType) String() string {
+	switch e {
+	case UNDEFINED_EXPR:
+		return "-?-"
+	case BINARY_EXPR:
+		return "BinaryExpression"
+	case GROUPING_EXPR:
+		return "GroupingExpression"
+	case LITERAL_EXPR:
+		return "LiteralExpression"
+	case UNARY_EXPR:
+		return "UnaryExpression"
+	case VAR_EXPR:
+		return "VariableExpression"
+	case ASSIGN_EXPR:
+		return "AssignmentExpression"
+	case LOGIC_EXPR:
+		return "LogicExpression"
+	case WHILE_EXPR:
+		return "WhileExpression"
+	case CALL_EXPR:
+		return "CallableExpression"
+	case FUN_EXPR:
+		return "FunctionExpression"
+	}
+
+	return "unknown"
+}

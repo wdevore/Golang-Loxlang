@@ -1,6 +1,10 @@
 package statements
 
-import "github.com/wdevore/RISCV-Meta-Assembler/src/api"
+import (
+	"fmt"
+
+	"github.com/wdevore/RISCV-Meta-Assembler/src/api"
+)
 
 type Statement struct {
 }
@@ -41,6 +45,10 @@ func (s *Statement) Type() api.InterruptType {
 	return api.INTERRUPT_UNKNOWN
 }
 
+func (s *Statement) StmtType() api.StatementType {
+	return api.STMT_UNKNOWN
+}
+
 func (s *Statement) Parameters() []api.IToken {
 	return nil
 }
@@ -51,6 +59,10 @@ func (s *Statement) Keyword() api.IToken {
 
 func (s *Statement) Value() api.IExpression {
 	return nil
+}
+
+func (s Statement) String() string {
+	return ""
 }
 
 // ---------------------------------------------------
@@ -76,6 +88,10 @@ func (s *ExpressionStatement) Expression() api.IExpression {
 	return s.expression
 }
 
+func (s ExpressionStatement) String() string {
+	return "Expression"
+}
+
 // ---------------------------------------------------
 // Block statement
 // ---------------------------------------------------
@@ -99,6 +115,10 @@ func (s *BlockStatement) Statements() []api.IStatement {
 	return s.statements
 }
 
+func (s BlockStatement) String() string {
+	return "BlockStatement"
+}
+
 // ---------------------------------------------------
 // Print statement
 // ---------------------------------------------------
@@ -120,6 +140,17 @@ func (s *PrintStatement) Accept(visitor api.IVisitorStatement) (err api.IRuntime
 
 func (s *PrintStatement) Expression() api.IExpression {
 	return s.expression
+}
+
+func (s PrintStatement) String() string {
+	msg := ""
+
+	if s.expression.Name() == nil {
+		msg = fmt.Sprintf("PrintStatement type: [%s]", s.expression.Type())
+	} else {
+		msg = fmt.Sprintf("PrintStatement line: [%d]", s.expression.Name().Line())
+	}
+	return msg
 }
 
 // ---------------------------------------------------
@@ -149,6 +180,10 @@ func (s *VarStatement) Initializer() api.IExpression {
 
 func (s *VarStatement) Name() api.IToken {
 	return s.name
+}
+
+func (s VarStatement) String() string {
+	return s.name.String()
 }
 
 // ---------------------------------------------------
@@ -186,6 +221,10 @@ func (s *IfStatement) ElseBranch() api.IStatement {
 	return s.elseBranch
 }
 
+func (s IfStatement) String() string {
+	return fmt.Sprintf("IfStatement line: [%d]", (s.condition.Operator().Line()))
+}
+
 // ---------------------------------------------------
 // "while" statement
 // ---------------------------------------------------
@@ -215,6 +254,10 @@ func (s *WhileStatement) Body() []api.IStatement {
 	return s.body
 }
 
+func (s WhileStatement) String() string {
+	return "WhileStatement"
+}
+
 // ---------------------------------------------------
 // "break", "continue" interrupt statements
 // ---------------------------------------------------
@@ -242,6 +285,10 @@ func (s *InterruptStatement) Type() api.InterruptType {
 
 func (s *InterruptStatement) Name() api.IToken {
 	return s.name
+}
+
+func (s InterruptStatement) String() string {
+	return "InterruptStatement " + s.iType.String()
 }
 
 // ---------------------------------------------------
@@ -278,6 +325,10 @@ func (s *FunctionStatement) Body() []api.IStatement {
 	return s.body
 }
 
+func (s FunctionStatement) String() string {
+	return "FunctionStatement " + s.name.Lexeme()
+}
+
 // ---------------------------------------------------
 // "return" statement
 // ---------------------------------------------------
@@ -311,4 +362,12 @@ func (s *ReturnStatement) Value() api.IExpression {
 
 func (s *ReturnStatement) Type() api.InterruptType {
 	return s.iType
+}
+
+func (s *ReturnStatement) StmtType() api.StatementType {
+	return api.STMT_RETURN
+}
+
+func (s ReturnStatement) String() string {
+	return "ReturnStatement"
 }

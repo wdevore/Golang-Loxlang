@@ -125,12 +125,14 @@ type LiteralExpression struct {
 
 	eType api.ExpressionType
 
+	name  api.IToken
 	value api.ILiteral
 }
 
-func NewLiteralExpression(value api.ILiteral) api.IExpression {
+func NewLiteralExpression(name api.IToken, value api.ILiteral) api.IExpression {
 	e := new(LiteralExpression)
 	e.value = value
+	e.name = name
 	e.eType = api.LITERAL_EXPR
 	return e
 }
@@ -145,6 +147,10 @@ func (e *LiteralExpression) Value() interface{} {
 
 func (e *LiteralExpression) Type() api.ExpressionType {
 	return e.eType
+}
+
+func (e *LiteralExpression) Name() api.IToken {
+	return e.name
 }
 
 // ---------------------------------------------------

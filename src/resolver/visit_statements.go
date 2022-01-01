@@ -89,6 +89,7 @@ func (r *Resolver) VisitReturnStatement(statement api.IStatement) (err api.IRunt
 			return err
 		}
 	}
+
 	return nil
 }
 

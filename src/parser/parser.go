@@ -450,18 +450,18 @@ func (p *Parser) finishCall(callee api.IExpression) (expr api.IExpression, err e
 func (p *Parser) primary() (expr api.IExpression, err error) {
 
 	if p.match(api.FALSE) {
-		return interpreter.NewLiteralExpression(literals.NewBooleanLiteral(false)), nil
+		return interpreter.NewLiteralExpression(nil, literals.NewBooleanLiteral(false)), nil
 	}
 	if p.match(api.TRUE) {
-		return interpreter.NewLiteralExpression(literals.NewBooleanLiteral(true)), nil
+		return interpreter.NewLiteralExpression(nil, literals.NewBooleanLiteral(true)), nil
 	}
 	if p.match(api.NIL) {
-		return interpreter.NewLiteralExpression(literals.NewNilLiteral()), nil
+		return interpreter.NewLiteralExpression(nil, literals.NewNilLiteral()), nil
 	}
 
 	if p.match(api.NUMBER, api.STRING) {
 		// NOTE: may need to copy the literal!!!!
-		return interpreter.NewLiteralExpression(p.previous().Literal()), nil
+		return interpreter.NewLiteralExpression(p.previous(), p.previous().Literal()), nil
 	}
 
 	// Parsing a variable expression

@@ -229,7 +229,7 @@ func (p *Parser) forStatement() (expr api.IStatement, err error) {
 	// If the condition is omitted, we jam in true to make an infinite
 	// loop
 	if condition == nil {
-		condition = interpreter.NewLiteralExpression(literals.NewBooleanLiteral(true))
+		condition = interpreter.NewLiteralExpression(nil, literals.NewBooleanLiteral(true))
 	}
 
 	body = statements.NewWhileStatement(condition, body)
