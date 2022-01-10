@@ -3,9 +3,9 @@ package interpreter
 import (
 	"fmt"
 
-	"github.com/wdevore/RISCV-Meta-Assembler/src/api"
-	"github.com/wdevore/RISCV-Meta-Assembler/src/errors"
-	"github.com/wdevore/RISCV-Meta-Assembler/src/scanner/literals"
+	"github.com/wdevore/Golang-Loxlang/src/api"
+	"github.com/wdevore/Golang-Loxlang/src/errors"
+	"github.com/wdevore/Golang-Loxlang/src/scanner/literals"
 )
 
 // -- ~~ -- ~~ -- ~~ -- ~~ -- ~~ -- ~~ -- ~~ -- ~~ -- ~~ --

@@ -1,8 +1,8 @@
 package interpreter
 
 import (
-	"github.com/wdevore/RISCV-Meta-Assembler/src/api"
-	"github.com/wdevore/RISCV-Meta-Assembler/src/errors"
+	"github.com/wdevore/Golang-Loxlang/src/api"
+	"github.com/wdevore/Golang-Loxlang/src/errors"
 )
 
 type Interpreter struct {

@@ -3,7 +3,7 @@ package errors
 import (
 	"log"
 
-	"github.com/wdevore/RISCV-Meta-Assembler/src/api"
+	"github.com/wdevore/Golang-Loxlang/src/api"
 )
 
 type Report struct {

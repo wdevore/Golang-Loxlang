@@ -1,6 +1,6 @@
 package scanner
 
-import "github.com/wdevore/RISCV-Meta-Assembler/src/api"
+import "github.com/wdevore/Golang-Loxlang/src/api"
 
 var Keywords = map[string]api.TokenType{
 	"const":    api.CONST,

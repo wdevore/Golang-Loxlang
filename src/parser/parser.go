@@ -3,10 +3,10 @@ package parser
 import (
 	"errors"
 
-	"github.com/wdevore/RISCV-Meta-Assembler/src/api"
-	"github.com/wdevore/RISCV-Meta-Assembler/src/interpreter"
-	"github.com/wdevore/RISCV-Meta-Assembler/src/scanner/literals"
-	"github.com/wdevore/RISCV-Meta-Assembler/src/statements"
+	"github.com/wdevore/Golang-Loxlang/src/api"
+	"github.com/wdevore/Golang-Loxlang/src/interpreter"
+	"github.com/wdevore/Golang-Loxlang/src/scanner/literals"
+	"github.com/wdevore/Golang-Loxlang/src/statements"
 )
 
 type Parser struct {

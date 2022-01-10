@@ -1,3 +1,3 @@
-module github.com/wdevore/RISCV-Meta-Assembler
+module github.com/wdevore/Golang-Loxlang
 
 go 1.17

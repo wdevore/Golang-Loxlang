@@ -3,7 +3,7 @@ package main
 import (
 	"log"
 
-	"github.com/wdevore/RISCV-Meta-Assembler/src"
+	"github.com/wdevore/Golang-Loxlang/src"
 )
 
 func main() {

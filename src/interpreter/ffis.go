@@ -3,7 +3,7 @@ package interpreter
 import (
 	"time"
 
-	"github.com/wdevore/RISCV-Meta-Assembler/src/api"
+	"github.com/wdevore/Golang-Loxlang/src/api"
 )
 
 // Some are FFIs and some are implementations

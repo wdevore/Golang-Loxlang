@@ -1,6 +1,6 @@
 package literals
 
-import "github.com/wdevore/RISCV-Meta-Assembler/src/api"
+import "github.com/wdevore/Golang-Loxlang/src/api"
 
 type StringLiteral struct {
 	value string

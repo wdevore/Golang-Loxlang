@@ -3,7 +3,7 @@ package literals
 import (
 	"fmt"
 
-	"github.com/wdevore/RISCV-Meta-Assembler/src/api"
+	"github.com/wdevore/Golang-Loxlang/src/api"
 )
 
 type HexNumberLiteral struct {

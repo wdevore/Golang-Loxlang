@@ -8,12 +8,12 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/wdevore/RISCV-Meta-Assembler/src/api"
-	"github.com/wdevore/RISCV-Meta-Assembler/src/errors"
-	"github.com/wdevore/RISCV-Meta-Assembler/src/interpreter"
-	"github.com/wdevore/RISCV-Meta-Assembler/src/parser"
-	"github.com/wdevore/RISCV-Meta-Assembler/src/resolver"
-	"github.com/wdevore/RISCV-Meta-Assembler/src/scanner"
+	"github.com/wdevore/Golang-Loxlang/src/api"
+	"github.com/wdevore/Golang-Loxlang/src/errors"
+	"github.com/wdevore/Golang-Loxlang/src/interpreter"
+	"github.com/wdevore/Golang-Loxlang/src/parser"
+	"github.com/wdevore/Golang-Loxlang/src/resolver"
+	"github.com/wdevore/Golang-Loxlang/src/scanner"
 )
 
 type Assembler struct {

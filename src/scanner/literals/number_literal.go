@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/wdevore/RISCV-Meta-Assembler/src/api"
+	"github.com/wdevore/Golang-Loxlang/src/api"
 )
 
 type NumberLiteral struct {
