@@ -69,7 +69,6 @@ const (
 	HI
 	LO
 
-	// RISC-V real instructions
 	ADD
 	SUB
 	XOR
@@ -110,7 +109,6 @@ const (
 	ECALL
 	EBREAK
 
-	// RISC-V pseudo instructions
 	LA
 	NOP
 	LI
